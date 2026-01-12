@@ -7,7 +7,7 @@ interface RegisterInput {
   
   password: string
   fullName: string
-  phone?: string
+  phone: string
   role?: "user" | "admin"
 }
 
@@ -26,7 +26,7 @@ export async function registerUser({ password, fullName, phone, role = "user" }:
   await db.insert(profiles).values({
     id: randomUUID(),
     fullName,
-    phone: phone ?? "",
+    phone: phone ,
     role
   })
 
