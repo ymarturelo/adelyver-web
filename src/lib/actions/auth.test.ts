@@ -53,7 +53,9 @@ describe('Auth Actions', () => {
         fullName: 'John Doe',
       })
 
-      expect(result).toEqual({ id: 'user-123' })
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(201)
+      expect(result.data?.id).toBe('user-123')
       expect(mockSupabaseAdmin.auth.admin.createUser).toHaveBeenCalledWith({
         password: 'password123',
         email: 'test@example.com',
@@ -93,7 +95,9 @@ describe('Auth Actions', () => {
         fullName: 'Jane Doe',
       })
 
-      expect(result).toEqual({ id: 'user-456' })
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(201)
+      expect(result.data?.id).toBe('user-456')
       expect(mockSupabaseAdmin.auth.admin.createUser).toHaveBeenCalledWith({
         password: 'password123',
         email: undefined,
@@ -101,22 +105,24 @@ describe('Auth Actions', () => {
       })
     })
 
-    it('should throw error if neither email nor phone provided', async () => {
-      await expect(
-        registerUser({
-          password: 'password123',
-          fullName: 'John Doe',
-        })
-      ).rejects.toThrow('Se requiere al menos email o phone')
+    it('should return 400 error if neither email nor phone provided', async () => {
+      const result = await registerUser({
+        password: 'password123',
+        fullName: 'John Doe',
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.status).toBe(400)
+      expect(result.error).toBeDefined()
     })
 
-    it('should throw error on createUser failure', async () => {
+    it('should return 400 error on createUser failure', async () => {
       const mockSupabaseAdmin = {
         auth: {
           admin: {
             createUser: vi.fn().mockResolvedValue({
               data: null,
-              error: new Error('User already exists'),
+              error: { message: 'User already exists' },
             }),
           },
         },
@@ -124,16 +130,18 @@ describe('Auth Actions', () => {
 
       vi.mocked(supabaseServer.supabaseAdmin).mockReturnValue(mockSupabaseAdmin as any)
 
-      await expect(
-        registerUser({
-          email: 'test@example.com',
-          password: 'password123',
-          fullName: 'John Doe',
-        })
-      ).rejects.toThrow('User already exists')
+      const result = await registerUser({
+        email: 'test@example.com',
+        password: 'password123',
+        fullName: 'John Doe',
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.status).toBe(400)
+      expect(result.error).toBeDefined()
     })
 
-    it('should throw error if user data is null', async () => {
+    it('should return 500 error if user data is null', async () => {
       const mockSupabaseAdmin = {
         auth: {
           admin: {
@@ -147,13 +155,15 @@ describe('Auth Actions', () => {
 
       vi.mocked(supabaseServer.supabaseAdmin).mockReturnValue(mockSupabaseAdmin as any)
 
-      await expect(
-        registerUser({
-          email: 'test@example.com',
-          password: 'password123',
-          fullName: 'John Doe',
-        })
-      ).rejects.toThrow('No se pudo crear el usuario')
+      const result = await registerUser({
+        email: 'test@example.com',
+        password: 'password123',
+        fullName: 'John Doe',
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.status).toBe(500)
+      expect(result.error).toBeDefined()
     })
 
     it('should set role as admin if provided', async () => {
@@ -182,13 +192,15 @@ describe('Auth Actions', () => {
 
       vi.mocked(db.db).insert = mockInsert
 
-      await registerUser({
+      const result = await registerUser({
         email: 'admin@example.com',
         password: 'password123',
         fullName: 'Admin User',
         role: 'admin',
       })
 
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(201)
       expect(mockInsert).toHaveBeenCalled()
       const valuesArg = mockValues.mock.calls[0][0]
       expect(valuesArg.role).toBe('admin')
@@ -216,10 +228,10 @@ describe('Auth Actions', () => {
         password: 'password123',
       })
 
-      expect(result).toEqual({
-        user: { id: 'user-123', email: 'test@example.com' },
-        session: { access_token: 'token-123', refresh_token: 'refresh-123' },
-      })
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(200)
+      expect(result.data?.user.id).toBe('user-123')
+      expect(result.data?.session.access_token).toBe('token-123')
       expect(mockSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'password123',
@@ -246,42 +258,45 @@ describe('Auth Actions', () => {
         password: 'password123',
       })
 
-      expect(result).toEqual({
-        user: { id: 'user-456', phone: '+34123456789' },
-        session: { access_token: 'token-456', refresh_token: 'refresh-456' },
-      })
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(200)
+      expect(result.data?.user.id).toBe('user-456')
       expect(mockSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
         phone: '+34123456789',
         password: 'password123',
       })
     })
 
-    it('should throw error if neither email nor phone provided', async () => {
-      await expect(
-        loginUser({
-          password: 'password123',
-        })
-      ).rejects.toThrow('Se requiere email o teléfono para iniciar sesión')
+    it('should return 400 error if neither email nor phone provided', async () => {
+      const result = await loginUser({
+        password: 'password123',
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.status).toBe(400)
+      expect(result.error).toBeDefined()
     })
 
-    it('should throw error on login failure', async () => {
+    it('should return 401 error on login failure', async () => {
       const mockSupabase = {
         auth: {
           signInWithPassword: vi.fn().mockResolvedValue({
             data: null,
-            error: new Error('Invalid credentials'),
+            error: { message: 'Invalid credentials' },
           }),
         },
       }
 
       vi.mocked(supabaseServer.supabase).mockReturnValue(mockSupabase as any)
 
-      await expect(
-        loginUser({
-          email: 'test@example.com',
-          password: 'wrongpassword',
-        })
-      ).rejects.toThrow('Invalid credentials')
+      const result = await loginUser({
+        email: 'test@example.com',
+        password: 'wrongpassword',
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.status).toBe(401)
+      expect(result.error).toBeDefined()
     })
 
     it('should prioritize email over phone when both provided', async () => {

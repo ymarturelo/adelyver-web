@@ -53,7 +53,9 @@ describe("Orders Actions", () => {
         ],
       })
 
-      expect(result.id).toBeDefined()
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(201)
+      expect(result.data?.id).toBeDefined()
       expect(mockTransaction).toHaveBeenCalled()
     })
 
@@ -68,17 +70,18 @@ describe("Orders Actions", () => {
 
       vi.mocked(supabaseServer.supabase).mockReturnValue(mockSupabase as any)
 
-      await expect(
-        createOrder({
-          items: [
-            {
-              storeOrderId: "store-001",
-              url: "https://example.com/1",
-              name: "Product 1",
-            },
-          ],
-        })
-      ).rejects.toThrow("Unauthorized")
+      const res = await createOrder({
+        items: [
+          {
+            storeOrderId: "store-001",
+            url: "https://example.com/1",
+            name: "Product 1",
+          },
+        ],
+      })
+
+      expect(res.success).toBe(false)
+      expect(res.status).toBe(401)
     })
   })
 
@@ -162,8 +165,9 @@ describe("Orders Actions", () => {
 
       const result = await getMyOrders()
 
-      expect(result).toHaveLength(1)
-      expect(result[0].clientId).toBe("user-123")
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(1)
+      expect(result.data[0].clientId).toBe("user-123")
     })
   })
 
@@ -194,8 +198,9 @@ describe("Orders Actions", () => {
 
       const result = await getOrderById("order-123")
 
-      expect(result?.id).toBe("order-123")
-      expect(result?.products).toBeDefined()
+      expect(result.success).toBe(true)
+      expect(result.data.id).toBe("order-123")
+      expect(result.data.products).toBeDefined()
     })
   })
 
@@ -224,7 +229,8 @@ describe("Orders Actions", () => {
 
       const result = await getAllOrders()
 
-      expect(result).toHaveLength(2)
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(2)
     })
   })
 
@@ -259,8 +265,9 @@ describe("Orders Actions", () => {
 
       const result = await filterOrders({ trackingNumber: "TRACK-123" })
 
-      expect(result).toHaveLength(1)
-      expect((result[0].products as any)[0]?.trackingNumber).toBe("TRACK-123")
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(1)
+      expect((result.data[0].products as any)[0]?.trackingNumber).toBe("TRACK-123")
     })
 
     it("should filter orders by product ID", async () => {
@@ -291,8 +298,9 @@ describe("Orders Actions", () => {
 
       const result = await filterOrders({ productId: "prod-123" })
 
-      expect(result).toHaveLength(1)
-      expect((result[0].products as any)[0]?.id).toBe("prod-123")
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(1)
+      expect((result.data[0].products as any)[0]?.id).toBe("prod-123")
     })
 
     it("should filter orders by client ID", async () => {
@@ -323,8 +331,9 @@ describe("Orders Actions", () => {
 
       const result = await filterOrders({ clientId: "user-456" })
 
-      expect(result).toHaveLength(1)
-      expect(result[0].clientId).toBe("user-456")
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(1)
+      expect(result.data[0].clientId).toBe("user-456")
     })
 
     it("should filter orders by client full name", async () => {
@@ -360,8 +369,9 @@ describe("Orders Actions", () => {
 
       const result = await filterOrders({ clientFullName: "John Doe" })
 
-      expect(result).toHaveLength(1)
-      expect(result[0].clientId).toBe("user-456")
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(1)
+      expect(result.data[0].clientId).toBe("user-456")
     })
 
     it("should return all orders if no filters provided", async () => {
@@ -388,7 +398,8 @@ describe("Orders Actions", () => {
 
       const result = await filterOrders({})
 
-      expect(result).toHaveLength(2)
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(2)
     })
   })
 

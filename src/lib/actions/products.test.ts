@@ -45,7 +45,9 @@ describe("Products Actions", () => {
         trackingNumber: "TRACK-123",
       })
 
-      expect(result.id).toBeDefined()
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(201)
+      expect(result.data?.id).toBeDefined()
       expect(mockInsert).toHaveBeenCalled()
     })
 
@@ -60,14 +62,15 @@ describe("Products Actions", () => {
 
       vi.mocked(supabaseServer.supabase).mockReturnValue(mockSupabase as any)
 
-      await expect(
-        createProduct({
-          orderId: "order-123",
-          storeOrderId: "store-001",
-          url: "https://example.com/product",
-          name: "Test Product",
-        })
-      ).rejects.toThrow("Unauthorized")
+      const res = await createProduct({
+        orderId: "order-123",
+        storeOrderId: "store-001",
+        url: "https://example.com/product",
+        name: "Test Product",
+      })
+
+      expect(res.success).toBe(false)
+      expect(res.status).toBe(401)
     })
   })
 
@@ -109,7 +112,9 @@ describe("Products Actions", () => {
 
       const result = await createBulkProducts("order-123", items)
 
-      expect(result).toHaveLength(2)
+      expect(result.success).toBe(true)
+      expect(result.status).toBe(201)
+      expect(result.data).toHaveLength(2)
       expect(mockTransaction).toHaveBeenCalled()
     })
   })
@@ -139,8 +144,9 @@ describe("Products Actions", () => {
 
       const result = await getProductsByOrder("order-123")
 
-      expect(result).toHaveLength(2)
-      expect(result[0].name).toBe("Product 1")
+      expect(result.success).toBe(true)
+      expect(result.data).toHaveLength(2)
+      expect(result.data[0].name).toBe("Product 1")
     })
   })
 
@@ -170,7 +176,8 @@ describe("Products Actions", () => {
 
       const result = await getProductById("prod-1")
 
-      expect(result?.name).toBe("Test Product")
+      expect(result.success).toBe(true)
+      expect(result.data.name).toBe("Test Product")
     })
   })
 
@@ -199,7 +206,8 @@ describe("Products Actions", () => {
         trackingNumber: "TRACK-456",
       })
 
-      expect(result.id).toBe("prod-1")
+      expect(result.success).toBe(true)
+      expect(result.data.id).toBe("prod-1")
       expect(mockUpdate).toHaveBeenCalled()
     })
   })
@@ -254,7 +262,8 @@ describe("Products Actions", () => {
         "TRACK-NEW-789"
       )
 
-      expect(result.trackingNumber).toBe("TRACK-NEW-789")
+      expect(result.success).toBe(true)
+      expect(result.data.trackingNumber).toBe("TRACK-NEW-789")
       expect(mockUpdate).toHaveBeenCalled()
     })
   })
