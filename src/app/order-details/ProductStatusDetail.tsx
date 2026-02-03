@@ -4,7 +4,7 @@ import {
   OrderStatusDescriptions,
   OrderStatusValues,
 } from "@/features/models/OrderModel";
-import CircularProgress from "./CircularProgress";
+import CircularProgress from "../__components/CircularProgress";
 
 type ProductStatusDetailProps = {
   orderStatus: OrderStatus;

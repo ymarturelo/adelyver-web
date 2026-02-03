@@ -1,10 +1,6 @@
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import CircularProgress from "./CircularProgress";
-import {
-  ORDER_STATUSES,
-  OrderStatus,
-  OrderStatusValues,
-} from "@/features/models/OrderModel";
+import { OrderStatus } from "@/features/models/OrderModel";
 import Link from "next/link";
 import { getOrderStatusInfo } from "@/features/models/OrderModel";
 

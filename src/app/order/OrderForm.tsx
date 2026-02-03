@@ -22,7 +22,7 @@ import { Button } from "@/app/__components/ui/button";
 import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
 import { LoginData, loginSchema } from "../__schemas/login.schema";
 import { OrderFormData, orderFormSchema } from "../__schemas/orderForm.schema";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../__components/ui/spinner";
 import { cn } from "../__lib/utils";
 import { createOrder } from "@/lib/actions/orders";
 

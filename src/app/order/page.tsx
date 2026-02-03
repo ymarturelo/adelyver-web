@@ -1,4 +1,4 @@
-import OrderForm from "../__components/OrderForm"
+import OrderForm from "./OrderForm"
 
 export default function OrderPage() {
   return (

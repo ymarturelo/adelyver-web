@@ -20,7 +20,7 @@ import {
   FieldLabel,
 } from "@/app/__components/ui/field";
 import { Button } from "@/app/__components/ui/button";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../__components/ui/spinner";
 import { cn } from "../__lib/utils";
 import { createClientAction } from "@/features/actions/ClientsController.actions";
 

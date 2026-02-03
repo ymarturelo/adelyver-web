@@ -24,6 +24,6 @@ export type FindClientsRequest = {
   phone?: string;
 };
 
-export type CreateClientRequest = ClientDto & {
+export type CreateClientRequest = Omit<ClientDto, "createdAt"> & {
   password: string;
 };
