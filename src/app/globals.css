@@ -1,4 +1,8 @@
 @import "tailwindcss";
+<<<<<<< Updated upstream
+=======
+/* @import "tw-animate-css/dist/tw-animate.css"; */
+>>>>>>> Stashed changes
 
 :root {
   --background: #ffffff;
