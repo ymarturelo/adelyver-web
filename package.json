@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
+    "test:unit": "vitest --exclude '**/*.integration.test.ts' --exclude '**/*.integration.test.tsx'",
+    "test:integration": "vitest --config vitest.integration.config.ts --run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "migrate:generate": "drizzle-kit generate",
