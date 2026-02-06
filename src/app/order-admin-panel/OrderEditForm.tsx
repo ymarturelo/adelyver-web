@@ -44,7 +44,7 @@ export default function OrderEditForm({
   };
 
   return (
-    <div className="">
+    <div>
       <form id="order-edit-form" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
           <Controller

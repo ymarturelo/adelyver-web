@@ -34,7 +34,7 @@ export default function OrderItemStatus({
       </div>
       <h3 className="text-xl">{label}</h3>
       <ChevronRightIcon
-        size={32}
+        size={24}
         className=" row-span-3 self-start"
       ></ChevronRightIcon>
       <div>

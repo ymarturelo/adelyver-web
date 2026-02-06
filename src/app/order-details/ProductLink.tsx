@@ -16,7 +16,7 @@ export default function ProductLink() {
       <h3 className="text-xl font-medium">Chancleta</h3>
       <Link href={""} className="row-span-2 place-self-center">
         <SquareArrowOutUpRight
-          size={28}
+          size={24}
           className=" text-gray-400 hover:text-primary transition-colors self-start"
         ></SquareArrowOutUpRight>
       </Link>
