@@ -1,8 +1,8 @@
-import { BugReportForm } from "../__components/DemoForm";
-import RegisterForm from "../__components/RegisterForm";
+
+import RegisterForm from "./RegisterForm";
 
 export default function RegisterPage() {
-  return <main className="grid px-4 min-h-dvh place-items-center">
+  return <main className="grid px-10 min-h-dvh place-items-center">
     <RegisterForm />
   </main>;
 }

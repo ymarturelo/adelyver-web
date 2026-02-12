@@ -1,0 +1,80 @@
+"use client";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, RegisterFormData } from "../__schemas/register.schema";
+import { useRouter } from "next/navigation";
+import { Input } from "@/app/__components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/app/__components/ui/card";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/app/__components/ui/field";
+import { Button } from "@/app/__components/ui/button";
+import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
+import { LoginData, loginSchema } from "../__schemas/login.schema";
+import { OrderFormData, orderFormSchema } from "../__schemas/orderForm.schema";
+import { Spinner } from "../__components/ui/spinner";
+import { cn } from "../__lib/utils";
+import { createOrder } from "@/lib/actions/orders";
+
+export default function OrderForm() {
+  const router = useRouter();
+  const form = useForm<OrderFormData>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: {
+      website: "",
+    },
+  });
+
+  return (
+    <Card className="w-full max-w-2xl">
+      <CardHeader>
+        <CardTitle>Inserte link del carrito</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form id="order-form" onSubmit={form.handleSubmit(()=>{})}></form>
+        <FieldGroup>
+          <Controller
+            control={form.control}
+            name="website"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <Input
+                  {...field}
+                  id="order-form-name"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="https://lorem-store.ipsum.com/ropa..."
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </FieldGroup>
+      </CardContent>
+      <CardFooter className="flex justify-end">
+        <Button
+          type="submit"
+          form="order-form"
+          disabled={form.formState.isSubmitting}
+        >
+          <Spinner
+            data-icon="inline-start"
+            className={cn(!form.formState.isSubmitting && "hidden")}
+          />
+          Continuar
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}

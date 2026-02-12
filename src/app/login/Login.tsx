@@ -2,7 +2,6 @@
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, RegisterFormData } from "../__schemas/register.schema";
 import { useRouter } from "next/navigation";
 import { Input } from "@/app/__components/ui/input";
 import {

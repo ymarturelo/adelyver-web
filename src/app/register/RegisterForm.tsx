@@ -20,6 +20,9 @@ import {
   FieldLabel,
 } from "@/app/__components/ui/field";
 import { Button } from "@/app/__components/ui/button";
+import { Spinner } from "../__components/ui/spinner";
+import { cn } from "../__lib/utils";
+import { createClientAction } from "@/features/actions/ClientsController.actions";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -34,8 +37,19 @@ export default function RegisterForm() {
     },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("Datos válidos:", data);
+  const onSubmit = async (data: RegisterFormData) => {
+    const res = await createClientAction({
+      fullName: data.name,
+      password: data.password,
+      phone: data.phone,
+      email: data.email,
+    });
+
+    if (!res.ok) {
+      form.setError("root", {
+        message: res.error.message ?? res.error.code,
+      });
+    }
   };
 
   return (
@@ -111,7 +125,8 @@ export default function RegisterForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Contraseña</FieldLabel>
-                  <Input type="password"
+                  <Input
+                    type="password"
                     {...field}
                     id="register-form-password"
                     aria-invalid={fieldState.invalid}
@@ -129,7 +144,8 @@ export default function RegisterForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Confirmar Contraseña</FieldLabel>
-                  <Input type="password"
+                  <Input
+                    type="password"
                     {...field}
                     id="register-form-confirmPassword"
                     aria-invalid={fieldState.invalid}
@@ -141,12 +157,19 @@ export default function RegisterForm() {
                 </Field>
               )}
             />
-           
           </FieldGroup>
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button type="submit" form="register-form">
+        <Button
+          type="submit"
+          form="register-form"
+          disabled={form.formState.isSubmitting}
+        >
+          <Spinner
+            data-icon="inline-start"
+            className={cn(!form.formState.isSubmitting && "hidden")}
+          />
           Registrarse
         </Button>
       </CardFooter>
