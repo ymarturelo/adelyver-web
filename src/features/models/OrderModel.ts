@@ -38,8 +38,24 @@ export const getOrderStatusInfo = (orderStatus: OrderStatus) => {
   const statusProgress = Math.min((statusIndex / latestStatusIndex) * 100, 100);
   const color = orderStatus === "cancelled" ? "text-red-500" : "text-green-500";
 
-
   return { label, progress: statusProgress, color };
+};
+export const getClientStats = (orders: { status: OrderStatus }[]) => {
+  const stats: Record<OrderStatus, number> = {
+    pending_review: 0,
+    confirmed: 0,
+    waiting_for_payment: 0,
+    ready_for_pickup: 0,
+    delivered: 0,
+    cancelled: 0,
+  };
+  orders.forEach((order) => {
+    if (stats[order.status] !== undefined) {
+      stats[order.status]++;
+    }
+  });
+
+  return stats;
 };
 
 export type OrderModel = {

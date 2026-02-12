@@ -31,7 +31,6 @@ import {
 } from "../__schemas/productFormValuesSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pencil } from "lucide-react";
 
 type OrderStatusSummaryProps = {
   orderStatus: OrderStatus;
@@ -132,17 +131,19 @@ export default function OrderStatusSummary({
                         form={form}
                         createdBy={createdBy}
                       ></ProductsEditForm>
-                      <DrawerFooter className="pr-6">
+                      <DrawerFooter>
                         <Button
                           onClick={form.handleSubmit(onSubmit)}
                           disabled={form.formState.isSubmitting}
-                          className="ml-auto w-[50%]"
                         >
                           {form.formState.isSubmitting && (
                             <Spinner className="mr-2" />
                           )}
                           Aplicar
                         </Button>
+                        <DrawerClose asChild>
+                          <Button variant="secondary">Atrás</Button>
+                        </DrawerClose>
                       </DrawerFooter>
                     </DrawerContent>
                   </Drawer>

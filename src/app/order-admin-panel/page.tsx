@@ -1,4 +1,4 @@
-import AdminOrderEdit from "./AdminOrderEdit";
+import AdminOrderEdit from "./OrderAdminPanel";
 
 export default function OrderAdminPanelPage() {
   return (

@@ -1,3 +1,4 @@
+"use client"
 import { ProductFormValues } from "../__schemas/productFormValuesSchema";
 import { Controller, UseFormReturn } from "react-hook-form";
 import {
@@ -9,19 +10,16 @@ import {
 import { Input } from "../__components/ui/input";
 
 type ProductFormValuesProps = {
-  createdBy: string;
+  createdBy:string;
   form: UseFormReturn<ProductFormValues>;
 };
 
 export default function ProductsEditForm({
-  createdBy,
-  form,
+ createdBy, form, 
 }: ProductFormValuesProps) {
   return (
     <div className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6">
         <FieldGroup className="pb-2">
-          <FieldLabel className="text-lg">
-          </FieldLabel>
           <Controller
             control={form.control}
             name="trackingNumber"

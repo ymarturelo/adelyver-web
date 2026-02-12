@@ -117,9 +117,12 @@ export default function ProductAdminEdit({
                         <ProductsEditForm form={form} createdBy={createdBy} />
                       </div>
                       <DrawerFooter className="border-t bg-background">
-                        <Button className="ml-auto w-[50%]">
+                        <Button>
                           Guardar Cambios
                         </Button>
+                        <DrawerClose asChild>
+                          <Button variant="secondary">Atrás</Button>
+                        </DrawerClose>
                       </DrawerFooter>
                     </div>
                   </DrawerContent>

@@ -43,9 +43,9 @@ export default function OrderStatusView() {
       <Button
         variant="outline"
         size="lg"
-        className="size-15 p-6 rounded-full ml-auto mr-6"
+        className="p-6 rounded-full ml-auto mr-6 mt-10"
       >
-        <Plus className="size-6" />
+        <Plus className="" />
       </Button>
     </>
   );

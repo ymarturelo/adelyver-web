@@ -6,11 +6,13 @@ export const registerSchema = z
 
     email: z.email("Correo electrónico inválido"),
 
-    phone: z.string().min(8, "El teléfono debe tener al menos 8 dígitos"),
+    phone: z.string().min(8, "El teléfono debe tener al menos 8 dígitos")
+    .regex(/^[0-9]+$/, "El teléfono solo debe contener números"),
 
     password: z
       .string()
       .min(6, "La contraseña debe tener al menos 6 caracteres"),
+      
 
     confirmPassword: z.string(),
   })
