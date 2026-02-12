@@ -10,14 +10,16 @@ import IOrdersController, {
 import {  supabaseAdmin } from "../../lib/supabase/server";
 
 import { randomUUID } from "crypto";
-import { successResponse, errorResponse, handleActionError, type ApiResponse } from "../../lib/actions/response";
+import { Result } from "../shared/Result";
+import { ProductModel } from "../models/ProductModel";
+import { OrderModel } from "../models/OrderModel";
 
 export const SupabaseOrdersController: IOrdersController = {
-  getClientOrderById: async (orderId: string): Promise<ApiResponse<ClientOrderDto>> => {
+  getClientOrderById: async (orderId: string): Promise<Result<ClientOrderDto>> => {
     try {
       const { data, error } = await supabaseAdmin().from("orders").select("*").eq("id", orderId).maybeSingle();
-      if (error) return errorResponse(400, error.message, "Error al obtener pedido");
-      if (!data) return errorResponse(404, "Pedido no encontrado", "No existe el pedido");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      if (!data) return Result.err({ code: "NOT_FOUND", message: "Pedido no encontrado" });
 
       const dto = {
         id: data.id,
@@ -32,19 +34,19 @@ export const SupabaseOrdersController: IOrdersController = {
         updatedAt: new Date(data.created_at),
       } as unknown as ClientOrderDto;
 
-      return successResponse(dto, 200, "Pedido obtenido exitosamente");
+      return Result.ok(dto);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  getClientAllOrders: async (): Promise<ApiResponse<ClientOrderDto[]>> => {
+  getClientAllOrders: async (): Promise<Result<ClientOrderDto[]>> => {
     try {
       const { data: userData } = await supabaseAdmin().auth.getUser();
-      if (!userData.user) return errorResponse(401, "Usuario no autenticado", "Autenticación requerida");
+      if (!userData.user) return Result.err({ code: "UNAUTHORIZED", message: "Usuario no autenticado" });
 
       const { data, error } = await supabaseAdmin().from("orders").select("*").eq("client_id", userData.user.id);
-      if (error) return errorResponse(400, error.message, "Error al obtener pedidos");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
 
       const dtos = (data ?? []).map((d: any) => ({
         id: d.id,
@@ -59,16 +61,17 @@ export const SupabaseOrdersController: IOrdersController = {
         updatedAt: new Date(d.created_at),
       } as unknown as ClientOrderDto));
 
-      return successResponse(dtos, 200, "Pedidos obtenidos exitosamente");
+      return Result.ok(dtos);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  getClientOrderProducts: async (orderId: string): Promise<ApiResponse<any[]>> => {
+  getClientOrderProducts: async (orderId: string): Promise<Result<ProductModel[]>> => {
     try {
       const { data, error } = await supabaseAdmin().from("products").select("*").eq("order_id", orderId);
-      if (error) return errorResponse(400, error.message, "Error al obtener productos");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      if (!data) return Result.err({ code: "NOT_FOUND", message: "Productos no encontrados" });
 
       const prods = (data ?? []).map((p: any) => ({
         id: p.id,
@@ -81,13 +84,13 @@ export const SupabaseOrdersController: IOrdersController = {
         updatedAt: new Date(),
       }));
 
-      return successResponse(prods, 200, "Productos obtenidos exitosamente");
+      return Result.ok(prods);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  findOrders: async (req: findOrdersRequest): Promise<ApiResponse<any[]>> => {
+  findOrders: async (req: findOrdersRequest): Promise<Result<OrderModel[]>> => {
     try {
     
       let query = supabaseAdmin().from("orders").select("*");
@@ -96,7 +99,7 @@ export const SupabaseOrdersController: IOrdersController = {
       if (req.clientName) {
         
         const { data: ordersData, error } = await query;
-        if (error) return errorResponse(400, error.message, "Error al buscar pedidos");
+        if (error) return Result.err({ code: "DB_ERROR", message: error.message });
         let filtered = (ordersData ?? []) as any[];
         
         if (req.trackingNumber) {
@@ -115,7 +118,7 @@ export const SupabaseOrdersController: IOrdersController = {
         if (req.ignoreCancelled) filtered = filtered.filter((o) => o.status !== "cancelled");
         if (req.ignoreDelievered) filtered = filtered.filter((o) => o.status !== "delivered");
 
-        return successResponse(filtered.map((d) => ({
+        const dtos = filtered.map((d) => ({
           id: d.id,
           clientId: d.client_id,
           status: d.status as any,
@@ -126,19 +129,21 @@ export const SupabaseOrdersController: IOrdersController = {
           shopCartUrl: "",
           createdAt: new Date(d.created_at),
           updatedAt: new Date(d.created_at),
-        } as unknown as any)), 200, "Pedidos encontrados exitosamente");
+        } ))
+
+        return Result.ok(dtos);
       }
 
      
       const { data, error } = await query;
-      if (error) return errorResponse(400, error.message, "Error al buscar pedidos");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
       const filtered = (data ?? []).filter((o: any) => {
         if (req.ignoreCancelled && o.status === "cancelled") return false;
         if (req.ignoreDelievered && o.status === "delivered") return false;
         return true;
       });
 
-      return successResponse(filtered.map((d: any) => ({
+      const dto = (filtered.map((d: any) => ({
         id: d.id,
         clientId: d.client_id,
         status: d.status as any,
@@ -149,38 +154,40 @@ export const SupabaseOrdersController: IOrdersController = {
         shopCartUrl: "",
         createdAt: new Date(d.created_at),
         updatedAt: new Date(d.created_at),
-      } as unknown as any)), 200, "Pedidos encontrados exitosamente");
+      } )));
+
+      return Result.ok(dto);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  createOrderByClient: async (req: CreateOrderByClientRequest): Promise<ApiResponse<void>> => {
+  createOrderByClient: async (req: CreateOrderByClientRequest): Promise<Result<void>> => {
     try {
       const { data } = await supabaseAdmin().auth.getUser();
-      if (!data.user) return errorResponse(401, "Usuario no autenticado", "Autenticación requerida");
+      if (!data.user) return Result.err({ code: "UNAUTHORIZED", message: "Usuario no autenticado" });
 
       const orderId = randomUUID();
       const { error } = await supabaseAdmin().from("orders").insert([{ id: orderId, client_id: data.user.id, status: "revision pendiente" }]);
-      if (error) return errorResponse(400, error.message, "Error al crear pedido");
-      return successResponse(undefined, 201, "Pedido creado exitosamente");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  createOrderByAdmin: async (req: CreateOrderByAdminRequest): Promise<ApiResponse<{ id: string }>> => {
+  createOrderByAdmin: async (req: CreateOrderByAdminRequest): Promise<Result<{ id: string }>> => {
     try {
       const id = randomUUID();
       const { error, data } = await supabaseAdmin().from("orders").insert([{ id, client_id: req.clientId, status: req.status as any, package_cost: (req.packagePrice ?? 0).toString(), shipping_cost: (req.deliveryPrice ?? 0).toString() }]);
-      if (error) return errorResponse(400, error.message, "Error al crear pedido");
-      return successResponse({ id }, 201, "Pedido creado exitosamente");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      return Result.ok({ id });
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  updateOrderByAdmin: async (req: UpdateOrderByAdminRequest): Promise<ApiResponse<void>> => {
+  updateOrderByAdmin: async (req: UpdateOrderByAdminRequest): Promise<Result<void>> => {
     try {
       const updateObj: any = {};
       if (req.status !== undefined) updateObj.status = req.status as any;
@@ -190,25 +197,25 @@ export const SupabaseOrdersController: IOrdersController = {
       if (req.paidByClient !== undefined) updateObj.paid_amount = req.paidByClient.toString();
 
       const { error } = await supabaseAdmin().from("orders").update(updateObj).eq("id", req.orderId);
-      if (error) return errorResponse(400, error.message, "Error al actualizar pedido");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
 
-      return successResponse(undefined, 200, "Pedido actualizado exitosamente");
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  createProductByAdmin: async (req: CreateProductRequest): Promise<ApiResponse<void>> => {
+  createProductByAdmin: async (req: CreateProductRequest): Promise<Result<void>> => {
     try {
       const { error } = await supabaseAdmin().from("products").insert([{ id: randomUUID(), order_id: req.orderId, store_order_id: req.idFromShop, url: req.url, name: req.name, tracking_number: req.trackingNumber }]);
-      if (error) return errorResponse(400, error.message, "Error al crear producto");
-      return successResponse(undefined, 201, "Producto creado exitosamente");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  updateProductByAdmin: async (req: UpdateProductRequest): Promise<ApiResponse<void>> => {
+  updateProductByAdmin: async (req: UpdateProductRequest): Promise<Result<void>> => {
     try {
       const updateObj: any = {};
       if (req.trackingNumber !== undefined) updateObj.tracking_number = req.trackingNumber;
@@ -217,20 +224,20 @@ export const SupabaseOrdersController: IOrdersController = {
       if (req.url !== undefined) updateObj.url = req.url;
 
       const { error } = await supabaseAdmin().from("products").update(updateObj).eq("id", req.id);
-      if (error) return errorResponse(400, error.message, "Error al actualizar producto");
-      return successResponse(undefined, 200, "Producto actualizado exitosamente");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  deleteProductByAdmin: async (id: string): Promise<ApiResponse<void>> => {
+  deleteProductByAdmin: async (id: string): Promise<Result<void>> => {
     try {
       const { error } = await supabaseAdmin().from("products").delete().eq("id", id);
-      if (error) return errorResponse(400, error.message, "Error al eliminar producto");
-      return successResponse(undefined, 200, "Producto eliminado exitosamente");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 };

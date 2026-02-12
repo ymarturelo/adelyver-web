@@ -1,12 +1,13 @@
 import IClientsController, { CreateClientRequest, FindClientsRequest, ClientDto } from "../abstractions/IClientsController";
 import {  supabaseAdmin } from "../../lib/supabase/server";
 import { successResponse, errorResponse, handleActionError, type ApiResponse } from "../../lib/actions/response";
+import { Result } from "../shared/Result";
 
 export const SupabaseClientsController: IClientsController = {
-  findClients: async (req: FindClientsRequest): Promise<ApiResponse<ClientDto[]>> => {
+  findClients: async (req: FindClientsRequest): Promise<Result<ClientDto[]>> => {
     try {
       const { data, error } = await supabaseAdmin().from("profiles").select("id,full_name,email,phone,created_at");
-      if (error) return errorResponse(400, error.message, "Error al buscar clientes");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
 
       let rows = data ?? [];
       if (req.name) {
@@ -23,13 +24,13 @@ export const SupabaseClientsController: IClientsController = {
         createdAt: new Date(r.created_at),
       }));
 
-      return successResponse(dtos, 200, "Clientes obtenidos exitosamente");
+      return Result.ok(dtos);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  createClient: async (req: CreateClientRequest): Promise<ApiResponse> => {
+  createClient: async (req: CreateClientRequest): Promise<Result<void>> => {
     try {
       const { data: userData, error } = await supabaseAdmin().auth.admin.createUser({
         
@@ -40,9 +41,9 @@ export const SupabaseClientsController: IClientsController = {
 
       if (error) {
         
-        return errorResponse(400, error.message, "No se pudo crear el usuario");
+        return Result.err({ code: "AUTH_ERROR", message: error.message });
       }
-      if (!userData.user) return errorResponse(500, "No se creó el usuario", "Error al crear usuario");
+      if (!userData.user) return Result.err({ code: "USER_CREATION_FAILED", message: "No se creó el usuario" });
 
       
       const { error: insertError } = await supabaseAdmin().from("profiles").insert({
@@ -55,17 +56,17 @@ export const SupabaseClientsController: IClientsController = {
 
       if (insertError) {
         
-        return errorResponse(400, insertError.message, "No se pudo crear el perfil");
+        return Result.err({ code: "DB_ERROR", message: insertError.message });
       }
 
-      return successResponse({ id: userData.user.id }, 201, "Cliente creado exitosamente");
+      return Result.ok(undefined);
     } catch (error) {
      
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  deleteCient: async (phone: string): Promise<ApiResponse<void>> => {
+  deleteCient: async (phone: string): Promise<Result<void>> => {
     try {
       
       const { data: existing } = await supabaseAdmin()
@@ -74,41 +75,36 @@ export const SupabaseClientsController: IClientsController = {
         .eq("phone", phone)
         .single();
 
-      if (!existing) return errorResponse(404, "Cliente no encontrado", "El cliente no existe");
+      if (!existing) return Result.err({ code: "NOT_FOUND", message: "Cliente no encontrado" });
 
       const { error } = await supabaseAdmin().from("profiles").delete().eq("phone", phone);
       
-      if (error) return errorResponse(400, error.message, "Error al eliminar el cliente");
+      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
 
-      return successResponse(undefined, 200, "Cliente eliminado exitosamente");
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  loginByPhone: async (phone: string, password: string): Promise<ApiResponse> => {
+  loginByPhone: async (phone: string, password: string): Promise<Result<void>> => {
     try {
       const { data, error } = await supabaseAdmin().auth.signInWithPassword({ phone, password } as any);
-      if (error) return errorResponse(401, "Credenciales inválidas", "Autenticación fallida");
-      return successResponse({
-        user: data.user,
-        session: data.session,
-      }, 200, "Inicio de sesión exitoso");
+      if (error) return Result.err({ code: "AUTH_FAILED", message: "Credenciales inválidas" });
+      return Result.ok(undefined);
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  loginByEmail: async (email: string, password: string): Promise<ApiResponse> => {
+  loginByEmail: async (email: string, password: string): Promise<Result<void>> => {
     try {
       const { data, error } = await supabaseAdmin().auth.signInWithPassword({ email, password } as any);
-      if (error) return errorResponse(401, "Credenciales inválidas", "Autenticación fallida");
-      return successResponse({
-        user: data.user,
-        session: data.session,
-      }, 200, "Inicio de sesión exitoso");
+      if (error) return Result.err({ code: "AUTH_FAILED", message: "Credenciales inválidas" });
+      return Result.ok(undefined);
+       
     } catch (error) {
-      return handleActionError(error);
+      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 };
