@@ -2,7 +2,6 @@
 import ClientInfoSummary from "./ClientInfoSummary";
 import { getClientStats, OrderStatus } from "@/features/models/OrderModel";
 import ClientOrderStats from "./ClientOrderStats";
-import ButtonNavigation from "./ButtonNavigation";
 import { Button } from "../__components/ui/button";
 import { Plus, PlusIcon } from "lucide-react";
 import {
@@ -15,6 +14,9 @@ import {
   DrawerTrigger,
 } from "../__components/ui/drawer";
 import CreateUserForm from "./CreateUserForm";
+import { useState } from "react";
+import { Spinner } from "../__components/ui/spinner";
+import { cn } from "../__lib/utils";
 
 type ClientMock = {
   name: string;
@@ -72,6 +74,8 @@ const clients: ClientMock[] = [
 ];
 
 export default function ClientsAdminPanel() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   return (
     <>
       <div className="px-6 w-full max-w-2xl">
@@ -94,12 +98,13 @@ export default function ClientsAdminPanel() {
           })}
         </div>
       </div>
-      <Drawer>
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerTrigger asChild>
           <Button
             variant="outline"
             size="lg"
             className="p-6 rounded-full ml-auto mr-2 mt-20"
+            disabled={isSaving}
           >
             <Plus />
           </Button>
@@ -108,9 +113,18 @@ export default function ClientsAdminPanel() {
           <DrawerHeader>
             <DrawerTitle>Crear Usuario</DrawerTitle>
           </DrawerHeader>
-          <CreateUserForm></CreateUserForm>
+          <CreateUserForm
+            onSuccess={() => setIsOpen(false)}
+            onLoading={setIsSaving}
+          ></CreateUserForm>
           <DrawerFooter>
-            <Button type="submit" form="create-user-form" className="w-full">
+            <Button
+              type="submit"
+              form="create-user-form"
+              disabled={isSaving}
+              className="w-full"
+            >
+              {isSaving && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
               Guardar Usuario
             </Button>
             <DrawerClose asChild>

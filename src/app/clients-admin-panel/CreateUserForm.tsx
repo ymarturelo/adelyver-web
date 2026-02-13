@@ -12,8 +12,20 @@ import {
   createUserSchema,
 } from "../__schemas/createClientForm.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createClientAction } from "@/features/actions/ClientsController.actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function CreateUserForm() {
+interface CreateUserFormProps {
+  onSuccess?: () => void;
+  onLoading: (loading: boolean) => void;
+}
+
+export default function CreateUserForm({
+  onSuccess,
+  onLoading,
+}: CreateUserFormProps) {
+  const router = useRouter();
   const form = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
@@ -25,9 +37,29 @@ export default function CreateUserForm() {
     },
   });
 
-  const onSubmit = (data: CreateUserFormData) => {
-    console.log("Cliente a crear:", data);
+  const onSubmit = async (data: CreateUserFormData) => {
+    onLoading?.(true);
+    try {
+      const res = await createClientAction({
+        fullName: data.name,
+        email: data.gmail,
+        phone: data.phone,
+        password: data.password,
+      });
+
+      if (!res.ok) {
+        toast.error(res.error.message);
+        return;
+      }
+
+      toast.success("Cliente creado correctamente");
+      onSuccess?.();
+      router.refresh();
+    } finally {
+      onLoading?.(false);
+    }
   };
+
   return (
     <div className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6">
       <form id="create-user-form" onSubmit={form.handleSubmit(onSubmit)}>
