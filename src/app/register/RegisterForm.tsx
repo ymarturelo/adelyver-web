@@ -23,6 +23,7 @@ import { Button } from "@/app/__components/ui/button";
 import { Spinner } from "../__components/ui/spinner";
 import { cn } from "../__lib/utils";
 import { createClientAction } from "@/features/actions/ClientsController.actions";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -46,10 +47,11 @@ export default function RegisterForm() {
     });
 
     if (!res.ok) {
-      form.setError("root", {
-        message: res.error.message ?? res.error.code,
-      });
+      toast.error(res.error.message);
+      return;
     }
+    toast.success("¡Bienvenido!");
+    router.refresh();
   };
 
   return (

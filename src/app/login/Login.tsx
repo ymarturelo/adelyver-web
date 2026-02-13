@@ -19,11 +19,17 @@ import {
   FieldLabel,
 } from "@/app/__components/ui/field";
 import { Button } from "@/app/__components/ui/button";
-import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
 import { LoginData, loginSchema } from "../__schemas/login.schema";
+import {
+  loginByEmailAction,
+  loginByPhoneAction,
+} from "@/features/actions/ClientsController.actions";
+import { toast } from "sonner";
+import { Spinner } from "../__components/ui/spinner";
+import { cn } from "../__lib/utils";
 
 export default function Login() {
-  const router = useRouter;
+  const router = useRouter();
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -31,8 +37,24 @@ export default function Login() {
       password: "",
     },
   });
-  const onSubmit = (data: LoginData) => {
-    console.log("Datos válidos:", data);
+  const onSubmit = async (data: LoginData) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmail = emailRegex.test(data.email);
+
+    let res;
+    if (isEmail) {
+      res = await loginByEmailAction(data.email, data.password);
+    } else {
+      res = await loginByPhoneAction(data.email, data.password);
+    }
+
+    if (!res.ok) {
+      toast.error(res.error.message);
+      return;
+    }
+    toast.success("¡Bienvenido!");
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (
@@ -84,7 +106,15 @@ export default function Login() {
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button type="submit" form="login-form">
+        <Button
+          type="submit"
+          form="login-form"
+          disabled={form.formState.isSubmitting}
+        >
+          <Spinner
+            data-icon="inline-start"
+            className={cn(!form.formState.isSubmitting && "hidden")}
+          />
           Autenticarse
         </Button>
       </CardFooter>
