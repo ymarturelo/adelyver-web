@@ -1,24 +1,42 @@
+"use client";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import CircularProgress from "../__components/CircularProgress";
 import { OrderStatus } from "@/features/models/OrderModel";
 import Link from "next/link";
 import { getOrderStatusInfo } from "@/features/models/OrderModel";
+import { Spinner } from "../__components/ui/spinner";
+import useClientGetOrderProducts from "@/queries/useClientGetOrderProducts";
 
 type OrderItemStatusProps = {
   orderStatus: OrderStatus;
-  createdAt: Date;
-  products: {
-    name: string;
-  }[];
   orderId: string;
+  createdAt: Date;
 };
 export default function OrderItemStatus({
   orderStatus,
-  createdAt,
-  products,
   orderId,
+  createdAt,
 }: OrderItemStatusProps) {
+  const productsQuery = useClientGetOrderProducts(orderId);
   const { label, progress, color } = getOrderStatusInfo(orderStatus);
+
+  if (productsQuery.isError) {
+    return (
+      <p>
+        Ha ocurrido un error cargando los productos:{" "}
+        {productsQuery.error.message}
+      </p>
+    );
+  }
+
+  if (productsQuery.isLoading || !productsQuery.data) {
+    return (
+      <span className="flex gap-2">
+        <Spinner />
+        <span>Cargando productos...</span>
+      </span>
+    );
+  }
 
   return (
     <Link
@@ -48,7 +66,7 @@ export default function OrderItemStatus({
         </p>
 
         <p className="font-light text-sm line-clamp-1">
-          {products.map((p) => p.name).join(", ")}
+          {productsQuery.data.map((p) => p.name).join(", ")}
         </p>
       </div>
     </Link>
