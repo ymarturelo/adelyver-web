@@ -1,44 +1,41 @@
+"use client";
+
 import { Button } from "../__components/ui/button";
 import { Plus } from "lucide-react";
 import OrderItemStatus from "./OrderItemStatus";
+import { Spinner } from "../__components/ui/spinner";
+import useGetClientAllOrders from "@/queries/useGetClientAllOrdersQuery";
 
 export default function OrderStatusView() {
+  const ordersQuery = useGetClientAllOrders();
+  if (ordersQuery.isError) {
+    return (
+      <p>
+        Ha ocurrido un error cargando los pedidos:{" "}
+        {ordersQuery.error.message}
+      </p>
+    );
+  }
+
+  if (ordersQuery.isLoading || !ordersQuery.data) {
+    return (
+      <span className="flex gap-2">
+        <Spinner />
+        <span>Cargando pedidos...</span>
+      </span>
+    );
+  }
   return (
     <>
       <div className="px-6 w-full max-w-2xl">
         <h1 className="mb-5">Tus pedidos</h1>
-        <OrderItemStatus
-          orderStatus="cancelled"
-          createdAt={new Date()}
-          orderId="1"
-          products={[
-            { name: "camiseta" },
-            { name: "redstone" },
-            { name: "manzana" },
-            { name: "zapato" },
-          ]}
-        />
-        <OrderItemStatus
-          orderStatus="confirmed"
-          createdAt={new Date()}
-          orderId="2"
-          products={[
-            { name: "camiseta" },
-            { name: "redstone" },
-            { name: "manzana" },
-            { name: "zapato" },
-          ]}
-        />
-        <OrderItemStatus
-          orderStatus="waiting_for_payment"
-          createdAt={new Date()}
-          orderId="3"
-          products={[
-            { name: "colcha" },
-            { name: "redstone" },
-            { name: "manzana" },
-          ]}
-        />
+        {ordersQuery.data.map((order) => (
+          <OrderItemStatus
+            orderId={order.id}
+            createdAt={order.createdAt}
+            orderStatus={order.status}
+          />
+        ))}
       </div>
       <Button
         variant="outline"

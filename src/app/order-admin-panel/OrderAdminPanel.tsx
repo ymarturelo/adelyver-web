@@ -1,84 +1,47 @@
-import { OrderStatus } from "@/features/models/OrderModel";
+"use client";
 import OrderStatusSummary from "./OrderStatusSummary";
-
-type OrderMock = {
-  id: string;
-  status: OrderStatus;
-  user: string;
-  products: {
-    name: string;
-    productLink: string;
-    productId: number;
-    trackingNumber: number;
-  }[];
-};
-
-const orders: OrderMock[] = [
-  {
-    id: "ord_123",
-    status: "confirmed",
-    user: "Yoel Rodriguez",
-    products: [
-      {
-        name: "Camiseta",
-        productId: 459874123,
-        productLink: "http://...fgfdgffgfb",
-        trackingNumber: 5698745896,
-      },
-      {
-        name: "Zapato",
-        productId: 4589783,
-        productLink: "http://...fgfdgffgfb",
-        trackingNumber: 5698745896,
-      },
-      {
-        name: "Abrigo",
-        productId: 23658974,
-        productLink: "http://...fgfdgffgfb",
-        trackingNumber: 5698745896,
-      },
-    ],
-  },
-  {
-    id: "ord_456",
-    status: "pending_review",
-    user: "Juan Perez",
-    products: [
-      {
-        name: "Zapato",
-        productId: 45678952155,
-        productLink: "http://...fgfvcvcxdcvxcvxcv",
-        trackingNumber: 58996367890,
-      },
-    ],
-  },
-  {
-    id: "ord_789",
-    status: "waiting_for_payment",
-    user: "Alicia Alonso",
-    products: [
-      {
-        name: "Zapato",
-        productId: 2,
-        productLink: "http://...fvvcgfvcv ",
-        trackingNumber: 67890,
-      },
-    ],
-  },
-];
+import { useSearchParams } from "next/navigation";
+import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
+import { Spinner } from "../__components/ui/spinner";
 
 export default function AdminOrderEdit() {
+  const searchParams = useSearchParams();
+  const ordersQuery = useFindOrdersQuery({
+    trackingNumber: searchParams.get("trackingNumber") ?? undefined,
+    clientName: searchParams.get("clientName") ?? undefined,
+    clientNumber: searchParams.get("clientNumber") ?? undefined,
+    productId: searchParams.get("productId") ?? undefined,
+    ignoreCancelled: false,
+    ignoreDelievered: false,
+  });
+
+  if (ordersQuery.isError) {
+    return (
+      <div className="p-6 text-destructive">
+        Error al cargar pedidos: {ordersQuery.error.message}
+      </div>
+    );
+  }
+
+  if (ordersQuery.isLoading || !ordersQuery.data) {
+    return (
+      <div className="flex items-center justify-center p-20 gap-3">
+        <Spinner /> <span>Cargando pedidos...</span>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="px-6 w-full max-w-2xl">
         <h1 className="mb-5">Pedidos</h1>
-        {orders.map((order) => (
+        {ordersQuery.data.length == 0} {<p>Aún no hay pedidos</p>}
+        {ordersQuery.data.map((order) => (
           <OrderStatusSummary
             key={order.id}
+            orderId={order.id}
             orderStatus={order.status}
             createdAt={new Date()}
-            products={order.products}
-            createdBy={order.user}
           />
         ))}
       </div>

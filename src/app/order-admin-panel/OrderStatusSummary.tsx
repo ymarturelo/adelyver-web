@@ -31,24 +31,20 @@ import {
 } from "../__schemas/productFormValuesSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import useClientGetOrderProducts from "@/queries/useClientGetOrderProducts";
 
 type OrderStatusSummaryProps = {
   orderStatus: OrderStatus;
   createdAt: Date;
-  products: {
-    name: string;
-    productLink: string;
-    productId: number;
-    trackingNumber: number;
-  }[];
-  createdBy: string;
+  orderId: string;
 };
 export default function OrderStatusSummary({
   orderStatus: initialStatus,
   createdAt,
-  products,
-  createdBy,
+  orderId,
 }: OrderStatusSummaryProps) {
+  const productsQuery = useClientGetOrderProducts(orderId);
+
   const [currentStatus, setCurrentStatus] =
     useState<OrderStatus>(initialStatus);
   const { label, progress, color } = getOrderStatusInfo(currentStatus);
@@ -65,6 +61,26 @@ export default function OrderStatusSummary({
   const onSubmit = (data: ProductFormValues) => {
     console.log("Datos válidos:", data);
   };
+
+  if (productsQuery.isError) {
+    return (
+      <p>
+        Ha ocurrido un error cargando los productos:{" "}
+        {productsQuery.error.message}
+      </p>
+    );
+  }
+
+  if (productsQuery.isLoading || !productsQuery.data) {
+    return (
+      <span className="flex gap-2">
+        <Spinner />
+        <span>Cargando productos...</span>
+      </span>
+    );
+  }
+
+  const createdBy = "lol";
 
   return (
     <>
@@ -91,7 +107,7 @@ export default function OrderStatusSummary({
                   {createdBy && ` por ${createdBy}`}
                 </p>
                 <p className="font-light text-sm line-clamp-1">
-                  {products.map((p) => p.name).join(", ")}
+                  {productsQuery.data.map((p) => p.name).join(", ")}
                 </p>
               </div>
             </AccordionTrigger>
@@ -100,12 +116,12 @@ export default function OrderStatusSummary({
                 <OrderEditForm
                   currentStatus={currentStatus}
                   onStatusChange={setCurrentStatus}
-                ></OrderEditForm>
+                />
                 <ProductAdminEdit
                   form={form}
-                  products={products}
+                  products={productsQuery.data}
                   createdBy={createdBy}
-                ></ProductAdminEdit>
+                />
                 <div className="grid gap-y-5 mt-10 ">
                   <Drawer>
                     <DrawerTrigger asChild>
@@ -127,10 +143,7 @@ export default function OrderStatusSummary({
                       <DrawerHeader>
                         <DrawerTitle>Añadir producto</DrawerTitle>
                       </DrawerHeader>
-                      <ProductsEditForm
-                        form={form}
-                        createdBy={createdBy}
-                      ></ProductsEditForm>
+                      <ProductsEditForm form={form} createdBy={createdBy} />
                       <DrawerFooter>
                         <Button
                           onClick={form.handleSubmit(onSubmit)}

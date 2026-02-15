@@ -1,4 +1,5 @@
-import { Icon, Pencil, Trash2 } from "lucide-react";
+"use client";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../__components/ui/button";
 import { useMemo } from "react";
 import {
@@ -14,14 +15,10 @@ import {
 import ProductsEditForm from "./ProductFormValues";
 import { UseFormReturn } from "react-hook-form";
 import { ProductFormValues } from "../__schemas/productFormValuesSchema";
+import { ProductModel } from "@/features/models/ProductModel";
 
 type ProductAdminEditProps = {
-  products: {
-    name: string;
-    productLink: string;
-    productId: number;
-    trackingNumber: number;
-  }[];
+  products: ProductModel[];
   form: UseFormReturn<ProductFormValues>;
   createdBy: string;
 };
@@ -30,7 +27,6 @@ export default function ProductAdminEdit({
   products,
   form,
   createdBy,
-  
 }: ProductAdminEditProps) {
   const groupedProducts = useMemo(() => {
     return Object.groupBy(products, (product) => product.trackingNumber);
@@ -42,9 +38,7 @@ export default function ProductAdminEdit({
       productLink: product.productLink,
       trackingNumber: String(product.trackingNumber),
     });
-    
   };
-
 
   return (
     <>
@@ -59,16 +53,16 @@ export default function ProductAdminEdit({
 
           {items?.map((product) => (
             <div
-              key={product.productId}
+              key={product.id}
               className="grid grid-cols-[1fr_auto] items-center gap-x-4 border-b last:border-none pb-4 last:pb-0 text-primary "
             >
               <div className="flex flex-col min-w-0">
                 <h4 className="text-lg font-semibold tracking-tight">
                   {product.name}
                 </h4>
-                <p className="text-sm font-mono ">#{product.productId}</p>
+                <p className="text-sm font-mono ">#{product.id}</p>
                 <p className=" text-sm text-muted-foreground hover:opacity-100 transition-opacity">
-                  {product.productLink}
+                  {product.url}
                 </p>
                 <div className="flex row-span-3 justify-end items-center gap-x-2 "></div>
               </div>
@@ -121,9 +115,7 @@ export default function ProductAdminEdit({
                         <ProductsEditForm form={form} createdBy={createdBy} />
                       </div>
                       <DrawerFooter className="border-t bg-background">
-                        <Button>
-                          Guardar Cambios
-                        </Button>
+                        <Button>Guardar Cambios</Button>
                         <DrawerClose asChild>
                           <Button variant="secondary">Atrás</Button>
                         </DrawerClose>
