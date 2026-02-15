@@ -32,7 +32,7 @@ export default interface IOrdersController {
   deleteProductByAdmin: (id: string) => Promise<Result<void>>;
 }
 
-export type ClientOrderDto = Omit<OrderModel, "shopCartUrl" | "spentMoney">;
+export type ClientOrderDto = Omit<OrderModel, "spentMoney">;
 
 export type FindOrdersRequest = {
   trackingNumber?: string;

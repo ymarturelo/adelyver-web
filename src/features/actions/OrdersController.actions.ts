@@ -24,6 +24,11 @@ export const createOrderByClientAction = createAction(
   "createOrderByClient"
 );
 
+export const updateOrderByClientAction = createAction(
+  "OrdersController",
+  "updateOrderByClient"
+);
+
 export const createOrderByAdminAction = createAction(
   "OrdersController",
   "createOrderByAdmin"

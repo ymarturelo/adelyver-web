@@ -41,6 +41,7 @@ export const createSupabaseOrdersController = (
         deliveryPrice: data.shippingCost,
         spentMoney: data.investedAmount,
         moneyPaidByClient: data.paidAmount,
+        shopCartUrl: data.shopCartUrl,
         createdAt: data.createdAt,
         updatedAt: data.createdAt,
       });
@@ -58,6 +59,7 @@ export const createSupabaseOrdersController = (
           deliveryPrice: d.shippingCost,
           spentMoney: d.investedAmount,
           moneyPaidByClient: d.paidAmount,
+          shopCartUrl: d.shopCartUrl,
           createdAt: d.createdAt,
           updatedAt: d.createdAt,
         }))

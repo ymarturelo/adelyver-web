@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { SquareArrowOutUpRight } from "lucide-react";
 import useClientGetOrderProducts from "@/queries/useClientGetOrderProducts";
-import { Spinner } from "../__components/ui/spinner";
+import { Spinner } from "../../__components/ui/spinner";
 import React from "react";
 
 type productLinkProps = {
   orderId: string;
 };
 
-export default function ProductLink({ orderId }: productLinkProps) {
+export default function ProductsLinks({ orderId }: productLinkProps) {
   const productQuery = useClientGetOrderProducts(orderId);
 
   if (productQuery.isLoading) {

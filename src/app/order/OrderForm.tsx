@@ -21,14 +21,14 @@ export default function OrderForm() {
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderFormSchema),
     defaultValues: {
-      website: "",
+      url: "",
     },
   });
 
   const { isSubmitting } = form.formState;
   const onSubmit = async (data: OrderFormData) => {
     const res = await createOrderByClientAction({
-      shopCartUrl: data.website,
+      shopCartUrl: data.url,
     });
 
     if (!res.ok) {
@@ -50,7 +50,7 @@ export default function OrderForm() {
         <FieldGroup>
           <Controller
             control={form.control}
-            name="website"
+            name="url"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <Input

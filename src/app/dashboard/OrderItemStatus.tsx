@@ -1,9 +1,8 @@
 "use client";
-import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import CircularProgress from "../__components/CircularProgress";
-import { OrderStatus } from "@/features/models/OrderModel";
 import Link from "next/link";
-import { getOrderStatusInfo } from "@/features/models/OrderModel";
+import { OrderStatus, getOrderStatusInfo } from "@/features/models/OrderModel";
 import { Spinner } from "../__components/ui/spinner";
 import useClientGetOrderProducts from "@/queries/useClientGetOrderProducts";
 
@@ -29,34 +28,25 @@ export default function OrderItemStatus({
     );
   }
 
-  if (productsQuery.isLoading || !productsQuery.data) {
-    return (
-      <span className="flex gap-2">
-        <Spinner />
-        <span>Cargando productos...</span>
-      </span>
-    );
-  }
+  const productsSummary =
+    productsQuery?.data?.map((p) => p.name).join(", ") ?? "";
+  const summaryMessage =
+    productsSummary.length > 0
+      ? productsSummary
+      : "Productos no identificados aún.";
 
   return (
     <Link
-      href={`/order/${orderId}`}
+      href={`/dashboard/${orderId}`}
       className="mr-auto grid grid-cols-[auto_1fr_auto] gap-y-1 gap-x-4 py-4  text-gray-400 hover:text-primary transition-colors"
     >
       <div className="row-span-3 h-fit place-self-center">
-        <CircularProgress
-          size={64}
-          progress={progress}
-          color={color}
-        ></CircularProgress>
+        <CircularProgress size={64} progress={progress} color={color} />
       </div>
       <h3 className="text-xl">{label}</h3>
-      <ChevronRightIcon
-        size={24}
-        className=" row-span-3 self-start"
-      ></ChevronRightIcon>
+      <ChevronRightIcon size={24} className=" row-span-3 self-center" />
       <div>
-        <p className="font-light text-sm">
+        <p className="text-sm mb-4">
           creado el{" "}
           {createdAt.toLocaleDateString("es-ES", {
             day: "numeric",
@@ -65,8 +55,12 @@ export default function OrderItemStatus({
           })}
         </p>
 
-        <p className="font-light text-sm line-clamp-1">
-          {productsQuery.data.map((p) => p.name).join(", ")}
+        <p className="font-light italic text-sm h-6 line-clamp-1">
+          {productsQuery.isLoading || !productsQuery.data ? (
+            <Spinner className="size-4" />
+          ) : (
+            summaryMessage
+          )}
         </p>
       </div>
     </Link>
