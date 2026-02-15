@@ -5,11 +5,13 @@ export default interface IClientsController {
 
   createClient: (req: CreateClientRequest) => Promise<Result<void>>;
 
-  deleteCient: (phone: string) => Promise<Result<void>>;
-
   loginByPhone: (phone: string, password: string) => Promise<Result<void>>;
 
   loginByEmail: (email: string, password: string) => Promise<Result<void>>;
+
+  signup: (req: CreateClientRequest) => Promise<Result<void>>;
+
+  logout: () => Promise<Result<void>>;
 }
 
 export type ClientDto = {

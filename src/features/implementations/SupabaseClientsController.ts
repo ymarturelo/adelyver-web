@@ -1,110 +1,218 @@
-import IClientsController, { CreateClientRequest, FindClientsRequest, ClientDto } from "../abstractions/IClientsController";
-import {  supabaseAdmin } from "../../lib/supabase/server";
-import { successResponse, errorResponse, handleActionError, type ApiResponse } from "../../lib/actions/response";
+import IClientsController, {
+  CreateClientRequest,
+  FindClientsRequest,
+  ClientDto,
+} from "../abstractions/IClientsController";
+import { supabaseAdmin, supabaseClient } from "../../lib/supabase/server";
 import { Result } from "../shared/Result";
 
+async function isAdmin(): Promise<boolean> {
+  const supabase = await supabaseClient(); // Cookie-based client
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Check if the user has the admin role in their metadata
+  return (
+    user?.app_metadata?.role === "admin" ||
+    user?.user_metadata?.role === "admin"
+  );
+}
+
 export const SupabaseClientsController: IClientsController = {
-  findClients: async (req: FindClientsRequest): Promise<Result<ClientDto[]>> => {
+  findClients: async (
+    req: FindClientsRequest
+  ): Promise<Result<ClientDto[]>> => {
     try {
-      const { data, error } = await supabaseAdmin().from("profiles").select("id,full_name,email,phone,created_at");
-      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
+      if (!(await isAdmin()))
+        return Result.err({
+          code: "UNAUTHORIZED",
+          message: "No tienes permisos",
+        });
+      const { data, error } = await supabaseAdmin().auth.admin.listUsers();
 
-      let rows = data ?? [];
-      if (req.name) {
-        rows = rows.filter((r: any) => (r.full_name ?? "").toLowerCase().includes(req.name!.toLowerCase()));
-      }
-      if (req.phone) {
-        rows = rows.filter((r: any) => (r.phone ?? "").includes(req.phone!));
+      if (error) {
+        return Result.err({ code: error.code + "", message: error.message });
       }
 
-      const dtos: ClientDto[] = rows.map((r: any) => ({
-        fullName: r.full_name,
-        phone: r.phone,
-        email: r.email ?? undefined,
-        createdAt: new Date(r.created_at),
-      }));
+      const filteredUsers = data.users.filter((u) => {
+        if (
+          req.name &&
+          u.user_metadata?.full_name
+            ?.toLowerCase()
+            .includes(req.name.toLowerCase())
+        ) {
+          return true;
+        }
+        if (req.phone && u.phone?.includes(req.phone)) {
+          return true;
+        }
+        return false;
+      });
+
+      const dtos = filteredUsers.map(
+        (u) =>
+          ({
+            fullName: u.user_metadata?.full_name,
+            phone: u.phone!,
+            email: u.email ?? undefined,
+            createdAt: new Date(u.created_at),
+          } satisfies ClientDto)
+      );
 
       return Result.ok(dtos);
     } catch (error) {
-      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
+      if (error instanceof Error) {
+        return Result.err({
+          code: error.name,
+          message: error.message,
+        });
+      }
+
+      return Result.err({
+        code: "UNKNOWN_ERROR",
+        message: "Ocurrió un error inesperado",
+      });
     }
   },
 
   createClient: async (req: CreateClientRequest): Promise<Result<void>> => {
     try {
-      const { data: userData, error } = await supabaseAdmin().auth.admin.createUser({
-        
+      if (!(await isAdmin()))
+        return Result.err({
+          code: "UNAUTHORIZED",
+          message: "No tienes permisos",
+        });
+      const supabase = supabaseAdmin();
+
+      const { error } = await supabase.auth.admin.createUser({
+        email: req.email ?? undefined,
+        phone: req.phone ?? undefined,
+        password: req.password,
+        email_confirm: true,
+        phone_confirm: true,
+        user_metadata: {
+          full_name: req.fullName,
+        },
+      });
+
+      if (error) {
+        return Result.err({ code: error.code + "", message: error.message });
+      }
+
+      return Result.ok(undefined);
+    } catch (error) {
+      if (error instanceof Error) {
+        return Result.err({
+          code: error.name,
+          message: error.message,
+        });
+      }
+
+      return Result.err({
+        code: "UNKNOWN_ERROR",
+        message: "Ocurrió un error inesperado",
+      });
+    }
+  },
+
+  loginByPhone: async (
+    phone: string,
+    password: string
+  ): Promise<Result<void>> => {
+    try {
+      const supabase = await supabaseClient();
+
+      const { error } = await supabase.auth.signInWithPassword({
+        phone,
+        password,
+      });
+      if (error)
+        return Result.err({
+          code: "AUTH_FAILED",
+          message: "Credenciales inválidas",
+        });
+      return Result.ok(undefined);
+    } catch (error) {
+      if (error instanceof Error) {
+        return Result.err({
+          code: error.name,
+          message: error.message,
+        });
+      }
+
+      return Result.err({
+        code: "UNKNOWN_ERROR",
+        message: "Ocurrió un error inesperado",
+      });
+    }
+  },
+
+  loginByEmail: async (
+    email: string,
+    password: string
+  ): Promise<Result<void>> => {
+    try {
+      const supabase = await supabaseClient();
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error)
+        return Result.err({
+          code: "AUTH_FAILED",
+          message: "Credenciales inválidas",
+        });
+      return Result.ok(undefined);
+    } catch (error) {
+      if (error instanceof Error) {
+        return Result.err({
+          code: error.name,
+          message: error.message,
+        });
+      }
+
+      return Result.err({
+        code: "UNKNOWN_ERROR",
+        message: "Ocurrió un error inesperado",
+      });
+    }
+  },
+
+  signup: async (req: CreateClientRequest): Promise<Result<void>> => {
+    try {
+      const supabase = await supabaseClient();
+
+      const { error } = await supabase.auth.signUp({
         email: req.email ?? undefined,
         phone: req.phone ?? undefined,
         password: req.password,
       });
 
       if (error) {
-        
-        return Result.err({ code: "AUTH_ERROR", message: error.message });
+        return Result.err({ code: error.code + "", message: error.message });
       }
-      if (!userData.user) return Result.err({ code: "USER_CREATION_FAILED", message: "No se creó el usuario" });
 
-      
-      const { error: insertError } = await supabaseAdmin().from("profiles").insert({
-        id: userData.user.id,
-        full_name: req.fullName,
-        phone: req.phone ?? null,
-        email: req.email ?? null,
-        role: "user",
+      return Result.ok(undefined);
+    } catch (error) {
+      if (error instanceof Error) {
+        return Result.err({
+          code: error.name,
+          message: error.message,
+        });
+      }
+
+      return Result.err({
+        code: "UNKNOWN_ERROR",
+        message: "Ocurrió un error inesperado",
       });
-
-      if (insertError) {
-        
-        return Result.err({ code: "DB_ERROR", message: insertError.message });
-      }
-
-      return Result.ok(undefined);
-    } catch (error) {
-     
-      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
     }
   },
 
-  deleteCient: async (phone: string): Promise<Result<void>> => {
-    try {
-      
-      const { data: existing } = await supabaseAdmin()
-        .from("profiles")
-        .select("id")
-        .eq("phone", phone)
-        .single();
-
-      if (!existing) return Result.err({ code: "NOT_FOUND", message: "Cliente no encontrado" });
-
-      const { error } = await supabaseAdmin().from("profiles").delete().eq("phone", phone);
-      
-      if (error) return Result.err({ code: "DB_ERROR", message: error.message });
-
-      return Result.ok(undefined);
-    } catch (error) {
-      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
-    }
-  },
-
-  loginByPhone: async (phone: string, password: string): Promise<Result<void>> => {
-    try {
-      const { data, error } = await supabaseAdmin().auth.signInWithPassword({ phone, password } as any);
-      if (error) return Result.err({ code: "AUTH_FAILED", message: "Credenciales inválidas" });
-      return Result.ok(undefined);
-    } catch (error) {
-      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
-    }
-  },
-
-  loginByEmail: async (email: string, password: string): Promise<Result<void>> => {
-    try {
-      const { data, error } = await supabaseAdmin().auth.signInWithPassword({ email, password } as any);
-      if (error) return Result.err({ code: "AUTH_FAILED", message: "Credenciales inválidas" });
-      return Result.ok(undefined);
-       
-    } catch (error) {
-      return Result.err({ code: "UNKNOWN_ERROR", message: "Ocurrió un error inesperado" });
-    }
+  logout: async function (): Promise<Result<void>> {
+    const supabase = await supabaseClient();
+    await supabase.auth.signOut();
+    return Result.ok(undefined);
   },
 };

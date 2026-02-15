@@ -1,14 +1,17 @@
 import IClientsController from "./abstractions/IClientsController";
 import IOrdersController from "./abstractions/IOrderController";
-import { MockClientsController } from "./implementations/MockClientsController";
-import { MockOrdersController } from "./implementations/MockOrdersController";
+import decorateWithRLS from "./implementations/decorators/RLSDecorator";
+import { SupabaseClientsController } from "./implementations/SupabaseClientsController";
+import { createSupabaseOrdersController } from "./implementations/SupabaseOrdersController";
 
 export type IocRegistry = {
   OrdersController: IOrdersController;
   ClientsController: IClientsController;
 };
 
-export const ioc: IocRegistry = {
-  OrdersController: MockOrdersController,
-  ClientsController: MockClientsController,
-} as const;
+export const getIoc = () => {
+  return {
+    OrdersController: decorateWithRLS(createSupabaseOrdersController),
+    ClientsController: SupabaseClientsController,
+  } as const;
+};

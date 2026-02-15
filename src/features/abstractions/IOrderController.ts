@@ -15,6 +15,10 @@ export default interface IOrdersController {
     req: CreateOrderByClientRequest
   ) => Promise<Result<void>>;
 
+  updateOrderByClient: (
+    req: UpdateOrderByClientRequest
+  ) => Promise<Result<void>>;
+
   createOrderByAdmin: (
     req: CreateOrderByAdminRequest
   ) => Promise<Result<{ id: string }>>;
@@ -50,6 +54,11 @@ export type CreateOrderByAdminRequest = {
   status: OrderStatus;
   packagePrice?: number;
   deliveryPrice?: number;
+};
+
+export type UpdateOrderByClientRequest = {
+  orderId: string;
+  shopCartUrl: string;
 };
 
 export type UpdateOrderByAdminRequest = {

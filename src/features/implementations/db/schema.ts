@@ -1,3 +1,4 @@
+import { OrderStatus } from "@/features/models/OrderModel";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -15,7 +16,10 @@ export const orders = pgTable(
 
     clientId: uuid("client_id").notNull(),
 
-    status: text("status").notNull(),
+    status: text("status")
+      .$type<OrderStatus>()
+      .notNull()
+      .default("pending_review"),
 
     packageCost: integer("package_cost").notNull().default(0),
 
@@ -24,6 +28,8 @@ export const orders = pgTable(
     investedAmount: integer("invested_amount").notNull().default(0),
 
     paidAmount: integer("paid_amount").notNull().default(0),
+
+    shopCartUrl: text("shop_cart_url").notNull(),
 
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -71,7 +77,7 @@ export const products = pgTable(
 
     name: text("name").notNull(),
 
-    trackingNumber: text("tracking_number"),
+    trackingNumber: text("tracking_number").notNull(),
 
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

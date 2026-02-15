@@ -1,28 +1,50 @@
 "use server";
 
-import { ioc } from "../ioc";
+import { createAction } from "./createAction";
 
-export const getClientOrderByIdAction = ioc.OrdersController.getClientOrderById;
+export const getClientOrderByIdAction = createAction(
+  "OrdersController",
+  "getClientOrderById"
+);
 
-export const getClientAllOrdersAction = ioc.OrdersController.getClientAllOrders;
+export const getClientAllOrdersAction = createAction(
+  "OrdersController",
+  "getClientAllOrders"
+);
 
-export const getClientOrderProductsAction =
-  ioc.OrdersController.getClientOrderProducts;
+export const getClientOrderProductsAction = createAction(
+  "OrdersController",
+  "getClientOrderProducts"
+);
 
-export const findOrdersAction = ioc.OrdersController.findOrders;
+export const findOrdersAction = createAction("OrdersController", "findOrders");
 
-export const createOrderByClientAction =
-  ioc.OrdersController.createOrderByClient;
+export const createOrderByClientAction = createAction(
+  "OrdersController",
+  "createOrderByClient"
+);
 
-export const createOrderByAdminAction = ioc.OrdersController.createOrderByAdmin;
+export const createOrderByAdminAction = createAction(
+  "OrdersController",
+  "createOrderByAdmin"
+);
 
-export const updateOrderByAdminAction = ioc.OrdersController.updateOrderByAdmin;
+export const updateOrderByAdminAction = createAction(
+  "OrdersController",
+  "updateOrderByAdmin"
+);
 
-export const createProductByAdminAction =
-  ioc.OrdersController.createProductByAdmin;
+export const createProductByAdminAction = createAction(
+  "OrdersController",
+  "createProductByAdmin"
+);
 
-export const updateProductByAdminAction =
-  ioc.OrdersController.updateProductByAdmin;
+export const updateProductByAdminAction = createAction(
+  "OrdersController",
+  "updateProductByAdmin"
+);
 
-export const deleteProductByAdminAction =
-  ioc.OrdersController.deleteProductByAdmin;
+export const deleteProductByAdminAction = createAction(
+  "OrdersController",
+  "deleteProductByAdmin"
+);

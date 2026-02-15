@@ -1,13 +1,23 @@
 "use server";
 
-import { ioc } from "../ioc";
+import { createAction } from "./createAction";
 
-export const findClientsAction = ioc.ClientsController.findClients;
+export const findClientsAction = createAction(
+  "ClientsController",
+  "findClients"
+);
 
-export const createClientAction = ioc.ClientsController.createClient;
+export const createClientAction = createAction(
+  "ClientsController",
+  "createClient"
+);
 
-export const deleteCientAction = ioc.ClientsController.deleteCient;
+export const loginByPhoneAction = createAction(
+  "ClientsController",
+  "loginByPhone"
+);
 
-export const loginByPhoneAction = ioc.ClientsController.loginByPhone;
-
-export const loginByEmailAction = ioc.ClientsController.loginByEmail;
+export const loginByEmailAction = createAction(
+  "ClientsController",
+  "loginByEmail"
+);
