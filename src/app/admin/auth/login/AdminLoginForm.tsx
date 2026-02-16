@@ -2,33 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginByEmailAction } from "@/features/actions/ClientsController.actions";
+import { toast } from "sonner";
 import {
   AdiminLoginFormData,
   adminLoginFormSchema,
-} from "../__schemas/adminLoginForm.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  createClientAction,
-  loginByEmailAction,
-} from "@/features/actions/ClientsController.actions";
-import { toast } from "sonner";
+} from "@/app/__schemas/adminLoginForm.schema";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../__components/ui/card";
+} from "@/app/__components/ui/card";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "../__components/ui/field";
-import { Input } from "../__components/ui/input";
-import { Button } from "../__components/ui/button";
-import { Spinner } from "../__components/ui/spinner";
-import { cn } from "../__lib/utils";
+} from "@/app/__components/ui/field";
+import { Input } from "@/app/__components/ui/input";
+import { Button } from "@/app/__components/ui/button";
+import { Spinner } from "@/app/__components/ui/spinner";
+import { cn } from "@/app/__lib/utils";
 
 export default function AdminLoginForm() {
   const router = useRouter();

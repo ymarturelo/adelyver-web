@@ -2,9 +2,9 @@
 import OrderStatusSummary from "./OrderStatusSummary";
 import { useRouter, useSearchParams } from "next/navigation";
 import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
-import { Spinner } from "../__components/ui/spinner";
-import { Button } from "../__components/ui/button";
-import { BrushCleaning, X } from "lucide-react";
+import { Spinner } from "@/app/__components/ui/spinner";
+import { Button } from "@/app/__components/ui/button";
+import { BrushCleaning } from "lucide-react";
 
 export default function OrderAdminPanel() {
   const searchParams = useSearchParams();

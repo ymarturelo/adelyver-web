@@ -5,10 +5,10 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../__components/ui/accordion";
-import { Separator } from "../__components/ui/separator";
+} from "../../__components/ui/accordion";
+import { Separator } from "../../__components/ui/separator";
 import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
-import { Spinner } from "../__components/ui/spinner";
+import { Spinner } from "../../__components/ui/spinner";
 
 type ClientInfoSummaryProps = {
   name: string;

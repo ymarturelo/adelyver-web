@@ -3,25 +3,19 @@ import {
   OrderStatus,
   OrderStatusValues,
 } from "@/features/models/OrderModel";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "../__components/ui/field";
-import { Input } from "../__components/ui/input";
-import { Button } from "../__components/ui/button";
+import { Field, FieldError, FieldLabel } from "../../__components/ui/field";
+import { Input } from "../../__components/ui/input";
+import { Button } from "../../__components/ui/button";
 import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
-import { Spinner } from "../__components/ui/spinner";
+import { Spinner } from "../../__components/ui/spinner";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import {
   updateClientNameData,
   updateClientNameSchema,
-} from "../__schemas/updateClientName.schema";
+} from "../../__schemas/updateClientName.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { findClientsAction } from "@/features/actions/ClientsController.actions";
-import { cn } from "../__lib/utils";
+import { cn } from "../../__lib/utils";
 
 type ClientOrderStatsProps = {
   initialName: string;

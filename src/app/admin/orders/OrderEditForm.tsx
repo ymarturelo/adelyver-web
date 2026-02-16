@@ -9,15 +9,15 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/app/__components/ui/field";
-import { Button } from "@/app/__components/ui/button";
+import AdminSelectStatus from "./AdminSelectStatus";
+import { OrderStatus } from "@/features/models/OrderModel";
 import {
   OrderEditFormData,
   orderEditFormSchema,
-} from "../__schemas/orderEditForm.schema";
-import AdminSelectStatus from "./AdminSelectStatus";
-import { Spinner } from "../__components/ui/spinner";
-import { cn } from "../__lib/utils";
-import { OrderStatus } from "@/features/models/OrderModel";
+} from "@/app/__schemas/orderEditForm.schema";
+import { cn } from "@/app/__lib/utils";
+import { Button } from "@/app/__components/ui/button";
+import { Spinner } from "@/app/__components/ui/spinner";
 
 type OrderEditFormProps = {
   currentStatus: OrderStatus;

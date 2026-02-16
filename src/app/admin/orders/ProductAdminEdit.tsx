@@ -1,6 +1,6 @@
 "use client";
 import { Pencil, Trash2 } from "lucide-react";
-import { Button } from "../__components/ui/button";
+import { Button } from "@/app/__components/ui/button";
 import { useMemo } from "react";
 import {
   Drawer,
@@ -11,11 +11,11 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "../__components/ui/drawer";
+} from "@/app/__components/ui/drawer";
 import ProductsEditForm from "./ProductFormValues";
 import { UseFormReturn } from "react-hook-form";
-import { ProductFormValues } from "../__schemas/productFormValuesSchema";
 import { ProductModel } from "@/features/models/ProductModel";
+import { ProductFormValues } from "@/app/__schemas/productFormValuesSchema";
 
 type ProductAdminEditProps = {
   products: ProductModel[];

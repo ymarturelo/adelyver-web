@@ -1,5 +1,5 @@
 import { ChartLine, House, UserRound } from "lucide-react";
-import { Button } from "../__components/ui/button";
+import { Button } from "../../__components/ui/button";
 
 export default function ButtonNavigation() {
   return (

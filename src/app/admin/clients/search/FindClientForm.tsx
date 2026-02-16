@@ -1,21 +1,22 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
+
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Search } from "lucide-react";
 import {
   FindClientFormData,
   findClientFormSchema,
-} from "../__schemas/findClientForm.schema";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from "@/app/__schemas/findClientForm.schema";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "../__components/ui/field";
-import { Input } from "../__components/ui/input";
-import { Button } from "../__components/ui/button";
-import { Spinner } from "../__components/ui/spinner";
-import { Search } from "lucide-react";
+} from "@/app/__components/ui/field";
+import { Input } from "@/app/__components/ui/input";
+import { Button } from "@/app/__components/ui/button";
+import { Spinner } from "@/app/__components/ui/spinner";
 
 export default function FindClientForm() {
   const router = useRouter();
