@@ -1,17 +1,19 @@
+import { db, TransactionType } from "../implementations/db";
 import { getIoc, IocRegistry } from "../ioc";
 
-type ControllerKeys = keyof IocRegistry;
+export default function createAction<P extends unknown[], R>(
+  callback: (
+    ioc: IocRegistry,
+    tx: TransactionType
+  ) => (...args: P) => Promise<R>
+) {
+  return async (...args: P): Promise<R> => {
+    return await db.transaction(async (tx) => {
+      const ioc = getIoc(tx);
 
-export function createAction<
-  K extends ControllerKeys,
-  M extends keyof IocRegistry[K]
->(controller: K, method: M): IocRegistry[K][M] {
-  const callback = async (...args: unknown[]) => {
-    const ioc = getIoc();
-    const instance = ioc[controller];
+      const method = callback(ioc, tx);
 
-    return await (instance[method] as (...args: unknown[]) => unknown)(...args);
+      return await method(...args);
+    });
   };
-
-  return callback as IocRegistry[K][M];
 }

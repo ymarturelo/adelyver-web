@@ -1,6 +1,6 @@
 import IClientsController from "./abstractions/IClientsController";
 import IOrdersController from "./abstractions/IOrderController";
-import decorateWithRLS from "./implementations/decorators/RLSDecorator";
+import { TransactionType } from "./implementations/db";
 import { SupabaseClientsController } from "./implementations/SupabaseClientsController";
 import { createSupabaseOrdersController } from "./implementations/SupabaseOrdersController";
 
@@ -9,9 +9,9 @@ export type IocRegistry = {
   ClientsController: IClientsController;
 };
 
-export const getIoc = () => {
+export const getIoc = (tx: TransactionType) => {
   return {
-    OrdersController: decorateWithRLS(createSupabaseOrdersController),
+    OrdersController: createSupabaseOrdersController(tx),
     ClientsController: SupabaseClientsController,
   } as const;
 };

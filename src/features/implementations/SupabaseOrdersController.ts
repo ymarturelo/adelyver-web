@@ -144,7 +144,7 @@ export const createSupabaseOrdersController = (
       await tx.insert(orders).values({
         id: randomUUID(),
         status: "pending_review",
-        clientId: sql`public.get_my_id()`,
+        clientId: sql`(current_setting('request.jwt.claims', true)::jsonb ->> 'sub')::uuid`,
         shopCartUrl: req.shopCartUrl,
       });
       return Result.ok(undefined);

@@ -14,7 +14,9 @@ export const orders = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
 
-    clientId: uuid("client_id").notNull(),
+    clientId: uuid("client_id")
+      .notNull()
+      .default(sql`public.get_my_id()`),
 
     status: text("status")
       .$type<OrderStatus>()
