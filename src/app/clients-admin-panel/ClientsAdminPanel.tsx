@@ -1,9 +1,8 @@
 "use client";
 import ClientInfoSummary from "./ClientInfoSummary";
-import { getClientStats, OrderStatus } from "@/features/models/OrderModel";
 import ClientOrderStats from "./ClientOrderStats";
 import { Button } from "../__components/ui/button";
-import { Plus, PlusIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -16,7 +15,6 @@ import {
 import CreateUserForm from "./CreateUserForm";
 import { useState } from "react";
 import { Spinner } from "../__components/ui/spinner";
-import { useQuery } from "@tanstack/react-query";
 import useGetClients from "@/queries/useGetClientsQuery";
 import { useSearchParams } from "next/navigation";
 

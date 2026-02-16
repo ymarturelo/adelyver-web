@@ -37,6 +37,8 @@ export const SupabaseClientsController: IClientsController = {
       }
 
       const filteredUsers = data.users.filter((u) => {
+        if (u.app_metadata?.role === "admin") return false;
+        if (!req.phone && !req.name) return true;
         if (
           req.name &&
           u.user_metadata?.full_name
@@ -186,8 +188,8 @@ export const SupabaseClientsController: IClientsController = {
       const supabase = await supabaseClient();
 
       const headerList = await headers();
-      const host = headerList.get("host"); // e.g., localhost:3000 or mydomain.com
-      const protocol = headerList.get("x-forwarded-proto") || "http";
+      const host = headerList.get("host");
+      const protocol = headerList.get("x-forwarded-proto") ?? "http";
 
       const origin = `${protocol}://${host}`;
 
@@ -197,6 +199,9 @@ export const SupabaseClientsController: IClientsController = {
         password: req.password,
         options: {
           emailRedirectTo: `${origin}/auth/verification-callback`,
+          data: {
+            full_name: req.fullName,
+          },
         },
       });
 

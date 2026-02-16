@@ -15,9 +15,7 @@ import {
 import { Input } from "../__components/ui/input";
 import { Button } from "../__components/ui/button";
 import { Spinner } from "../__components/ui/spinner";
-import { cn } from "../__lib/utils";
-import { Phone, Search } from "lucide-react";
-import useGetClients from "@/queries/useGetClientsQuery";
+import { Search } from "lucide-react";
 
 export default function FindClientForm() {
   const router = useRouter();
@@ -85,7 +83,7 @@ export default function FindClientForm() {
             className="rounded-full"
             disabled={isSubmitting}
           >
-            {isSubmitting ? <Spinner/> : <Search className="" />}
+            {isSubmitting ? <Spinner /> : <Search className="" />}
           </Button>
         </div>
       </form>
