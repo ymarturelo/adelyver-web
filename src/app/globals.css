@@ -122,3 +122,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .text-h1 {
+    @apply scroll-m-20 text-center text-4xl font-bold tracking-tight text-balance;
+  }
+
+  .text-h2 {
+    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+  }
+
+  .text-h3 {
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+  }
+
+  .text-h4 {
+    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+  }
+
+  .text-p {
+    @apply leading-7 [&:not(:first-child)]:mt-6;
+  }
+
+  .text-lead {
+    @apply text-muted-foreground text-xl;
+  }
+}

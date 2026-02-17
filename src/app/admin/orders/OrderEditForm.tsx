@@ -1,7 +1,6 @@
 "use client";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { Input } from "@/app/__components/ui/input";
 import {
   Field,
@@ -10,7 +9,7 @@ import {
   FieldLabel,
 } from "@/app/__components/ui/field";
 import AdminSelectStatus from "./AdminSelectStatus";
-import { OrderStatus } from "@/features/models/OrderModel";
+import { OrderModel } from "@/features/models/OrderModel";
 import {
   OrderEditFormData,
   orderEditFormSchema,
@@ -18,28 +17,42 @@ import {
 import { cn } from "@/app/__lib/utils";
 import { Button } from "@/app/__components/ui/button";
 import { Spinner } from "@/app/__components/ui/spinner";
+import { updateOrderByAdminAction } from "@/features/actions/OrdersController.actions";
+import { getDirtyItemsData } from "@/app/__lib/getDirtyItemsData";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 type OrderEditFormProps = {
-  currentStatus: OrderStatus;
-  onStatusChange: (status: OrderStatus) => void;
+  order: OrderModel;
 };
-export default function OrderEditForm({
-  currentStatus,
-  onStatusChange,
-}: OrderEditFormProps) {
-  const router = useRouter();
+
+export default function OrderEditForm({ order }: OrderEditFormProps) {
+  const queryClient = useQueryClient();
   const form = useForm<OrderEditFormData>({
     resolver: zodResolver(orderEditFormSchema),
     defaultValues: {
-      status: currentStatus,
-      amountPaidByClient: 0,
-      investedMoney: 0,
-      packagePrice: 0,
-      shippingPrice: 0,
+      status: order.status,
+      moneyPaidByClient: order.moneyPaidByClient,
+      spentMoney: order.spentMoney,
+      packagePrice: order.packagePrice,
+      deliveryPrice: order.deliveryPrice,
     },
   });
-  const onSubmit = (data: OrderEditFormData) => {
-    form.reset(data);
+
+  const onSubmit = async (data: OrderEditFormData) => {
+    const dirtyFields = form.formState.dirtyFields;
+    const dirtyValues = getDirtyItemsData(data, dirtyFields);
+
+    const res = await updateOrderByAdminAction({
+      ...dirtyValues,
+      orderId: order.id,
+    });
+
+    if (!res.ok) {
+      toast.error(res.error.message);
+    } else {
+      await queryClient.invalidateQueries({ queryKey: ["orders"] });
+    }
   };
 
   return (
@@ -56,9 +69,8 @@ export default function OrderEditForm({
                   value={field.value}
                   onValueChange={(val) => {
                     field.onChange(val);
-                    onStatusChange(val);
                   }}
-                ></AdminSelectStatus>
+                />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -85,7 +97,7 @@ export default function OrderEditForm({
           />
           <Controller
             control={form.control}
-            name="shippingPrice"
+            name="deliveryPrice"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Precio del envío (USD)</FieldLabel>
@@ -103,7 +115,7 @@ export default function OrderEditForm({
           />
           <Controller
             control={form.control}
-            name="investedMoney"
+            name="spentMoney"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Dinero invertido (USD)</FieldLabel>
@@ -122,7 +134,7 @@ export default function OrderEditForm({
           />
           <Controller
             control={form.control}
-            name="amountPaidByClient"
+            name="moneyPaidByClient"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Dinero pagado por el cliente (USD)</FieldLabel>

@@ -66,8 +66,8 @@ export type UpdateOrderByAdminRequest = {
   status?: OrderStatus;
   packagePrice?: number;
   deliveryPrice?: number;
-  spentMoney: number;
-  paidByClient: number;
+  spentMoney?: number;
+  moneyPaidByClient?: number;
 };
 
 export type CreateProductRequest = {

@@ -16,24 +16,7 @@ export default function OrderItemStatus({
   orderId,
   createdAt,
 }: OrderItemStatusProps) {
-  const productsQuery = useClientGetOrderProducts(orderId);
   const { label, progress, color } = getOrderStatusInfo(orderStatus);
-
-  if (productsQuery.isError) {
-    return (
-      <p>
-        Ha ocurrido un error cargando los productos:{" "}
-        {productsQuery.error.message}
-      </p>
-    );
-  }
-
-  const productsSummary =
-    productsQuery?.data?.map((p) => p.name).join(", ") ?? "";
-  const summaryMessage =
-    productsSummary.length > 0
-      ? productsSummary
-      : "Productos no identificados aún.";
 
   return (
     <Link
@@ -53,14 +36,6 @@ export default function OrderItemStatus({
             month: "numeric",
             year: "2-digit",
           })}
-        </p>
-
-        <p className="font-light italic text-sm h-6 line-clamp-1">
-          {productsQuery.isLoading || !productsQuery.data ? (
-            <Spinner className="size-4" />
-          ) : (
-            summaryMessage
-          )}
         </p>
       </div>
     </Link>

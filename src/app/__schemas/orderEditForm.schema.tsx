@@ -14,15 +14,15 @@ export const orderEditFormSchema = z.object({
     .transform(Number)
     .pipe(z.number("Debe ser un número").min(0, "No puede ser negativo")),
 
-  shippingPrice: z
+  deliveryPrice: z
     .transform(Number)
     .pipe(z.number("Debe ser un número").min(0, "No puede ser negativo")),
 
-  investedMoney: z
+  spentMoney: z
     .transform(Number)
     .pipe(z.number("Debe ser un número").min(0, "No puede ser negativo")),
 
-  amountPaidByClient: z
+  moneyPaidByClient: z
     .transform(Number)
     .pipe(z.number("Debe ser un número").min(0, "No puede ser negativo")),
 });

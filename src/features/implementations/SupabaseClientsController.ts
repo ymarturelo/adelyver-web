@@ -230,4 +230,26 @@ export const SupabaseClientsController: IClientsController = {
     await supabase.auth.signOut();
     return Result.ok(undefined);
   },
+
+  isAdmin: async function (): Promise<Result<boolean>> {
+    const supabase = await supabaseClient();
+    const { data, error } = await supabase.auth.getClaims();
+
+    if (error) {
+      return Result.err({ code: error.code + "", message: error.message });
+    }
+
+    return Result.ok(data?.claims.app_metadata?.role === "admin");
+  },
+
+  isAuthenticated: async function (): Promise<Result<boolean>> {
+    const supabase = await supabaseClient();
+    const { data, error } = await supabase.auth.getClaims();
+
+    if (error) {
+      return Result.err({ code: error.code + "", message: error.message });
+    }
+
+    return Result.ok(data?.claims.role === "authenticated");
+  },
 };

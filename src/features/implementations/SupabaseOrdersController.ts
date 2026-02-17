@@ -1,4 +1,4 @@
-import { eq, sql, ilike } from "drizzle-orm";
+import { eq, sql, ilike, desc } from "drizzle-orm";
 import IOrdersController, {
   ClientOrderDto,
   FindOrdersRequest,
@@ -48,7 +48,9 @@ export const createSupabaseOrdersController = (
     },
 
     getClientAllOrders: async (): Promise<Result<ClientOrderDto[]>> => {
-      const data = await tx.query.orders.findMany();
+      const data = await tx.query.orders.findMany({
+        orderBy: orders.updatedAt,
+      });
 
       return Result.ok(
         data.map((d) => ({
@@ -117,6 +119,7 @@ export const createSupabaseOrdersController = (
 
           return and(...conditions);
         },
+        orderBy: desc(orders.updatedAt),
       });
 
       return Result.ok(
@@ -188,6 +191,7 @@ export const createSupabaseOrdersController = (
         .update(orders)
         .set({
           shopCartUrl: req.shopCartUrl,
+          updatedAt: new Date(),
         })
         .where(eq(orders.id, req.orderId));
 
@@ -204,7 +208,8 @@ export const createSupabaseOrdersController = (
           packageCost: req.packagePrice,
           shippingCost: req.deliveryPrice,
           investedAmount: req.spentMoney,
-          paidAmount: req.paidByClient,
+          paidAmount: req.moneyPaidByClient,
+          updatedAt: new Date(),
         })
         .where(eq(orders.id, req.orderId));
 

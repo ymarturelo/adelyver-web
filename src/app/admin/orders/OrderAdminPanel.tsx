@@ -1,14 +1,13 @@
 "use client";
 import OrderStatusSummary from "./OrderStatusSummary";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
 import { Spinner } from "@/app/__components/ui/spinner";
 import { Button } from "@/app/__components/ui/button";
-import { BrushCleaning } from "lucide-react";
+import { Plus } from "lucide-react";
 
 export default function OrderAdminPanel() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const clientNameFilter = searchParams.get("clientName") ?? undefined;
   const clientNumberFilter = searchParams.get("clientNumber") ?? undefined;
@@ -21,10 +20,6 @@ export default function OrderAdminPanel() {
     ignoreCancelled: false,
     ignoreDelievered: false,
   });
-
-  const clearFilters = () => {
-    router.push("/admin/");
-  };
 
   if (ordersQuery.isError) {
     return (
@@ -44,33 +39,25 @@ export default function OrderAdminPanel() {
 
   return (
     <>
-      <div className="px-6 w-full max-w-2xl">
+      <div className="w-full">
         {(clientNameFilter || clientNumberFilter) && (
           <div className="flex items-center w-full gap-2 mb-6 p-2 ">
             <span className="text-xl">
-              Pedidos de {clientNameFilter || clientNumberFilter}
+              Pedidos de {clientNameFilter ?? clientNumberFilter}
             </span>{" "}
           </div>
         )}
 
         {ordersQuery.data.length == 0 && <p>Aún no hay pedidos</p>}
         {ordersQuery.data.map((order) => (
-          <OrderStatusSummary
-            key={order.id}
-            orderId={order.id}
-            orderStatus={order.status}
-            createdAt={order.createdAt}
-            spentMoney={String(order.spentMoney)}
-            moneyPaidByClient={String(order.moneyPaidByClient)}
-          />
+          <OrderStatusSummary key={order.id} order={order} />
         ))}
       </div>
       <Button
-        
         className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
         title="Añadir Pedido"
       >
-        <BrushCleaning className="size-6" />
+        <Plus className="size-6" />
       </Button>
     </>
   );

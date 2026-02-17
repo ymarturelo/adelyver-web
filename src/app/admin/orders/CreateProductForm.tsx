@@ -1,0 +1,83 @@
+import {
+  ProductFormValues,
+  productFormValuesSchema,
+} from "@/app/__schemas/productFormValuesSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import ProductForm from "./ProductForm";
+import { createProductByAdminAction } from "@/features/actions/OrdersController.actions";
+import { toast } from "sonner";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/app/__components/ui/drawer";
+import { Button } from "@/app/__components/ui/button";
+import { Spinner } from "@/app/__components/ui/spinner";
+import { useQueryClient } from "@tanstack/react-query";
+
+type CreateProductFormProps = {
+  orderId: string;
+};
+
+export default function CreateProductForm({ orderId }: CreateProductFormProps) {
+  const queryClient = useQueryClient();
+
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormValuesSchema),
+    defaultValues: {
+      trackingNumber: "",
+      name: "",
+      idFromShop: "",
+      url: "",
+    },
+  });
+
+  const onSubmit = async (data: ProductFormValues) => {
+    const res = await createProductByAdminAction({ ...data, orderId });
+    if (!res.ok) {
+      toast.error(res.error.message);
+      return;
+    }
+
+    await queryClient.invalidateQueries({ queryKey: ["orders"] });
+    toast.success("Producto creado correctamente");
+
+    form.reset();
+  };
+
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button variant={"outline"}>Añadir Producto</Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Añadir producto</DrawerTitle>
+        </DrawerHeader>
+        <ProductForm
+          id={`new-product-form-${orderId}`}
+          form={form}
+          onSubmit={onSubmit}
+        />
+        <DrawerFooter className="grid gap-2">
+          <Button
+            type="submit"
+            form={`new-product-form-${orderId}`}
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting && <Spinner className="mr-2" />}
+            Añadir
+          </Button>
+          <DrawerClose asChild>
+            <Button variant="secondary">Atrás</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}

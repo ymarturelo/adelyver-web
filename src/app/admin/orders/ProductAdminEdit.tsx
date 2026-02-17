@@ -12,7 +12,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/app/__components/ui/drawer";
-import ProductsEditForm from "./ProductFormValues";
 import { UseFormReturn } from "react-hook-form";
 import { ProductModel } from "@/features/models/ProductModel";
 import { ProductFormValues } from "@/app/__schemas/productFormValuesSchema";
@@ -26,7 +25,6 @@ type ProductAdminEditProps = {
 export default function ProductAdminEdit({
   products,
   form,
-  createdBy,
 }: ProductAdminEditProps) {
   const groupedProducts = useMemo(() => {
     return Object.groupBy(products, (product) => product.trackingNumber);
@@ -34,8 +32,8 @@ export default function ProductAdminEdit({
   const handleEditClick = async (product: any) => {
     form.reset({
       name: product.name,
-      productId: String(product.productId),
-      productLink: product.productLink,
+      idFromShop: String(product.productId),
+      url: product.productLink,
       trackingNumber: String(product.trackingNumber),
     });
   };
@@ -112,7 +110,7 @@ export default function ProductAdminEdit({
                         <DrawerTitle>Editar Producto</DrawerTitle>
                       </DrawerHeader>
                       <div className="flex-1 overflow-y-auto">
-                        <ProductsEditForm form={form} createdBy={createdBy} />
+                        {/* <CreateProductForm form={form} /> */}
                       </div>
                       <DrawerFooter className="border-t bg-background">
                         <Button>Guardar Cambios</Button>

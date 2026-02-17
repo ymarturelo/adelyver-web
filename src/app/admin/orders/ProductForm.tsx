@@ -9,17 +9,22 @@ import {
 import { Input } from "@/app/__components/ui/input";
 import { ProductFormValues } from "@/app/__schemas/productFormValuesSchema";
 
-type ProductFormValuesProps = {
-  createdBy: string;
+type ProductFormValuesProps = Omit<React.ComponentProps<"form">, "onSubmit"> & {
   form: UseFormReturn<ProductFormValues>;
+  onSubmit: (data: ProductFormValues) => void;
 };
 
-export default function ProductsEditForm({
-  createdBy,
+export default function ProductForm({
   form,
+  onSubmit,
+  ...props
 }: ProductFormValuesProps) {
   return (
-    <div className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6">
+    <form
+      {...props}
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6"
+    >
       <FieldGroup className="pb-2">
         <Controller
           control={form.control}
@@ -55,7 +60,7 @@ export default function ProductsEditForm({
         />
         <Controller
           control={form.control}
-          name="productId"
+          name="idFromShop"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>ID del producto</FieldLabel>
@@ -71,7 +76,7 @@ export default function ProductsEditForm({
         />
         <Controller
           control={form.control}
-          name="productLink"
+          name="url"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>URL del producto</FieldLabel>
@@ -86,6 +91,6 @@ export default function ProductsEditForm({
           )}
         />
       </FieldGroup>
-    </div>
+    </form>
   );
 }

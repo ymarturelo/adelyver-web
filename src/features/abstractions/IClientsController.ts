@@ -12,6 +12,10 @@ export default interface IClientsController {
   signup: (req: CreateClientRequest) => Promise<Result<void>>;
 
   logout: () => Promise<Result<void>>;
+
+  isAdmin: () => Promise<Result<boolean>>;
+
+  isAuthenticated: () => Promise<Result<boolean>>;
 }
 
 export type ClientDto = {
