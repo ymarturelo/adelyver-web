@@ -1,6 +1,5 @@
 import { Plus } from "lucide-react";
 import { Button } from "../__components/ui/button";
-import { Drawer, DrawerTrigger } from "../__components/ui/drawer";
 import OrderStatusView from "./OrderStatusView";
 import CreateOrderForm from "./CreateOrderForm";
 
@@ -13,21 +12,16 @@ export default function OrderStatusViewPage() {
         </h1>
       </header>
       <main className="w-full max-w-2xl justify-self-center h-full grid grid-rows-[1fr_auto]">
-        <Drawer>
-          <div className="h-full">
-            <OrderStatusView />
-          </div>
+        <OrderStatusView />
 
-          <DrawerTrigger asChild>
-            <Button
-              className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
-              title="Abrir formulario de crear orden"
-            >
-              <Plus className="size-6" />
-            </Button>
-          </DrawerTrigger>
-          <CreateOrderForm />
-        </Drawer>
+        <CreateOrderForm>
+          <Button
+            className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
+            title="Abrir formulario de crear orden"
+          >
+            <Plus className="size-6" />
+          </Button>
+        </CreateOrderForm>
       </main>
     </div>
   );

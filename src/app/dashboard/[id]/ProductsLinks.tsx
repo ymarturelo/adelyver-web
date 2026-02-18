@@ -1,15 +1,21 @@
 import Link from "next/link";
 import { SquareArrowOutUpRight } from "lucide-react";
-import useClientGetOrderProducts from "@/queries/useClientGetOrderProducts";
+import useGetClientOrderProducts from "@/queries/useGetClientOrderProducts";
 import { Spinner } from "../../__components/ui/spinner";
 import React from "react";
+import { ClientOrderDto } from "@/features/abstractions/IOrderController";
 
 type productLinkProps = {
-  orderId: string;
+  order: ClientOrderDto;
 };
 
-export default function ProductsLinks({ orderId }: productLinkProps) {
-  const productQuery = useClientGetOrderProducts(orderId);
+export default function ProductsLinks({ order }: productLinkProps) {
+  const enabled = order.status !== "pending_review";
+  const productQuery = useGetClientOrderProducts(order.id, enabled);
+
+  if (!enabled) {
+    return <></>;
+  }
 
   if (productQuery.isLoading) {
     return (
@@ -43,7 +49,7 @@ export default function ProductsLinks({ orderId }: productLinkProps) {
             <SquareArrowOutUpRight
               size={28}
               className=" text-gray-400 hover:text-primary transition-colors self-start"
-            ></SquareArrowOutUpRight>
+            />
           </Link>
           <p className="font-light text-sm col-start-1 truncate">
             {product.url}

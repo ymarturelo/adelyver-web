@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function useGetClientOrderByIdQuery(orderId: string) {
   return useQuery({
-    queryKey: ["order-by-id", orderId],
+    queryKey: ["orders", orderId],
     queryFn: async () => {
       const res = await getClientOrderByIdAction(orderId);
 

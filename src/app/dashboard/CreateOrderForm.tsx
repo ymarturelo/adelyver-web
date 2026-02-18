@@ -11,14 +11,22 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
+  Drawer,
+  DrawerTrigger,
 } from "../__components/ui/drawer";
 import OrderForm from "./OrderForm";
 import { Button } from "../__components/ui/button";
 import { Spinner } from "../__components/ui/spinner";
 import { cn } from "../__lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-export default function CreateOrderForm() {
+export default function CreateOrderForm({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const form = useForm<OrderFormData>({
@@ -39,37 +47,41 @@ export default function CreateOrderForm() {
     }
 
     await queryClient.invalidateQueries({
-      queryKey: ["client-orders"],
+      queryKey: ["orders"],
     });
 
     toast.success("Pedido creado exitosamente");
+    setIsDrawerOpen(false);
     form.reset();
   };
 
   return (
-    <DrawerContent>
-      <DrawerHeader>
-        <DrawerTitle>Crear nuevo pedido</DrawerTitle>
-        <DrawerDescription>
-          Ingresa la url del carrito de compras
-        </DrawerDescription>
-      </DrawerHeader>
-      <div className="p-4 pb-0">
-        <OrderForm id="create-order-form" form={form} onSubmit={onSubmit} />
-      </div>
-      <DrawerFooter>
-        <Button
-          type="submit"
-          form="create-order-form"
-          disabled={form.formState.isSubmitting}
-        >
-          <Spinner
-            data-icon="inline-start"
-            className={cn(!form.formState.isSubmitting && "hidden")}
-          />
-          Crear pedido
-        </Button>
-      </DrawerFooter>
-    </DrawerContent>
+    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Crear nuevo pedido</DrawerTitle>
+          <DrawerDescription>
+            Ingresa la url del carrito de compras
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="p-4 pb-0">
+          <OrderForm id="create-order-form" form={form} onSubmit={onSubmit} />
+        </div>
+        <DrawerFooter>
+          <Button
+            type="submit"
+            form="create-order-form"
+            disabled={form.formState.isSubmitting}
+          >
+            <Spinner
+              data-icon="inline-start"
+              className={cn(!form.formState.isSubmitting && "hidden")}
+            />
+            Crear pedido
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function useGetClientAllOrders() {
   return useQuery({
-    queryKey: ["client-orders"],
+    queryKey: ["orders", "client"],
     queryFn: async () => {
       const res = await getClientAllOrdersAction();
 

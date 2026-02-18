@@ -5,13 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Input } from "@/app/__components/ui/input";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/app/__components/ui/card";
-import {
   Field,
   FieldError,
   FieldGroup,
@@ -60,7 +53,6 @@ export default function Login() {
 
     toast.success("¡Bienvenido!");
     router.push(isAdminRes.data ? "/admin" : "/dashboard");
-    router.refresh();
   };
 
   return (

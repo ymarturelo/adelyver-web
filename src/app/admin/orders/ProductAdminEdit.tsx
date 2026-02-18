@@ -1,7 +1,6 @@
 "use client";
-import { Pencil, Trash2 } from "lucide-react";
+import { ExternalLinkIcon, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/app/__components/ui/button";
-import { useMemo } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -12,38 +11,58 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/app/__components/ui/drawer";
-import { UseFormReturn } from "react-hook-form";
-import { ProductModel } from "@/features/models/ProductModel";
-import { ProductFormValues } from "@/app/__schemas/productFormValuesSchema";
+import useGetClientOrderProducts from "@/queries/useGetClientOrderProducts";
+import { Spinner } from "@/app/__components/ui/spinner";
+import { deleteProductByAdminAction } from "@/features/actions/OrdersController.actions";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 type ProductAdminEditProps = {
-  products: ProductModel[];
-  form: UseFormReturn<ProductFormValues>;
-  createdBy: string;
+  orderId: string;
 };
 
-export default function ProductAdminEdit({
-  products,
-  form,
-}: ProductAdminEditProps) {
-  const groupedProducts = useMemo(() => {
-    return Object.groupBy(products, (product) => product.trackingNumber);
-  }, [products]);
-  const handleEditClick = async (product: any) => {
-    form.reset({
-      name: product.name,
-      idFromShop: String(product.productId),
-      url: product.productLink,
-      trackingNumber: String(product.trackingNumber),
+export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
+  const queryClient = useQueryClient();
+  const productsQuery = useGetClientOrderProducts(orderId);
+
+  const onRemoveProduct = async (productId: string) => {
+    const res = await deleteProductByAdminAction(productId);
+
+    if (!res.ok) {
+      toast.error(res.error.message);
+      return;
+    }
+
+    await queryClient.invalidateQueries({
+      queryKey: ["orders", orderId, "products"],
     });
+
+    toast.success("Producto eliminado correctamente");
   };
+
+  if (productsQuery.isError) {
+    return <p>Error al cargar productos</p>;
+  }
+  if (productsQuery.isLoading || !productsQuery.data) {
+    return (
+      <div className="py-8">
+        <Spinner />
+        <span>Cargando productos...</span>
+      </div>
+    );
+  }
+
+  const groupedProducts = Object.groupBy(
+    productsQuery.data,
+    (product) => product.trackingNumber
+  );
 
   return (
     <>
       {Object.entries(groupedProducts).map(([trackingNumber, items]) => (
         <div
           key={trackingNumber}
-          className="flex flex-col gap-y-6 px-5 py-8 mt-10 border border-gray-500 rounded-lg relative  "
+          className="grid gap-y-6 px-5 py-8 mt-10 border border-gray-500 rounded-lg relative  "
         >
           <span className="absolute -top-4 left-4 bg-background px-2 text-xl ">
             {trackingNumber}
@@ -58,10 +77,24 @@ export default function ProductAdminEdit({
                 <h4 className="text-lg font-semibold tracking-tight">
                   {product.name}
                 </h4>
-                <p className="text-sm font-mono ">#{product.id}</p>
-                <p className=" text-sm text-muted-foreground hover:opacity-100 transition-opacity">
-                  {product.url}
+                <p className="text-sm font-mono text-muted-foreground mb-1">
+                  #{product.idFromShop}
                 </p>
+                <Button
+                  asChild
+                  variant="link"
+                  className="p-0 !px-0 justify-start text-muted-foreground"
+                >
+                  <a
+                    href={product.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm items-center gap-1 hover:opacity-100 transition-opacity"
+                  >
+                    <span className="truncate">{product.url}</span>
+                    <ExternalLinkIcon size={16} />
+                  </a>
+                </Button>
                 <div className="flex row-span-3 justify-end items-center gap-x-2 "></div>
               </div>
               <div className="">
@@ -72,6 +105,7 @@ export default function ProductAdminEdit({
                       variant={"ghost"}
                       size={"icon"}
                       className=" h-9 w-9 hover:text-destructive"
+                      onClick={() => onRemoveProduct(product.id)}
                     >
                       <Trash2 size={18}></Trash2>
                     </Button>
@@ -99,7 +133,6 @@ export default function ProductAdminEdit({
                       variant="ghost"
                       size="icon"
                       className="h-9 w-9 hover:text-primary"
-                      onClick={() => handleEditClick(product)}
                     >
                       <Pencil size={18} />
                     </Button>
@@ -109,9 +142,6 @@ export default function ProductAdminEdit({
                       <DrawerHeader>
                         <DrawerTitle>Editar Producto</DrawerTitle>
                       </DrawerHeader>
-                      <div className="flex-1 overflow-y-auto">
-                        {/* <CreateProductForm form={form} /> */}
-                      </div>
                       <DrawerFooter className="border-t bg-background">
                         <Button>Guardar Cambios</Button>
                         <DrawerClose asChild>

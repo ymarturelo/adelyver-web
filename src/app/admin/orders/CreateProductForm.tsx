@@ -19,6 +19,7 @@ import {
 import { Button } from "@/app/__components/ui/button";
 import { Spinner } from "@/app/__components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 type CreateProductFormProps = {
   orderId: string;
@@ -26,6 +27,7 @@ type CreateProductFormProps = {
 
 export default function CreateProductForm({ orderId }: CreateProductFormProps) {
   const queryClient = useQueryClient();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormValuesSchema),
@@ -47,11 +49,12 @@ export default function CreateProductForm({ orderId }: CreateProductFormProps) {
     await queryClient.invalidateQueries({ queryKey: ["orders"] });
     toast.success("Producto creado correctamente");
 
+    setIsDrawerOpen(false);
     form.reset();
   };
 
   return (
-    <Drawer>
+    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
       <DrawerTrigger asChild>
         <Button variant={"outline"}>Añadir Producto</Button>
       </DrawerTrigger>
@@ -59,11 +62,13 @@ export default function CreateProductForm({ orderId }: CreateProductFormProps) {
         <DrawerHeader>
           <DrawerTitle>Añadir producto</DrawerTitle>
         </DrawerHeader>
-        <ProductForm
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
           id={`new-product-form-${orderId}`}
-          form={form}
-          onSubmit={onSubmit}
-        />
+          className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6"
+        >
+          <ProductForm id={`new-product-form-${orderId}`} form={form} />
+        </form>
         <DrawerFooter className="grid gap-2">
           <Button
             type="submit"

@@ -1,32 +1,32 @@
-"use client";
-import { Controller, useForm } from "react-hook-form";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "../../__components/ui/field";
-import { Input } from "../../__components/ui/input";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/app/__components/ui/drawer";
 import {
   CreateUserFormData,
   createUserSchema,
-} from "../../__schemas/createClientForm.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from "@/app/__schemas/createClientForm.schema";
 import { createClientAction } from "@/features/actions/ClientsController.actions";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-
-type CreateUserFormProps = {
-  onSuccess?: () => void;
-  onLoading?: (loading: boolean) => void;
-};
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import UserForm from "./UserForm";
+import { Button } from "@/app/__components/ui/button";
+import { useState } from "react";
 
 export default function CreateUserForm({
-  onSuccess,
-  onLoading,
-}: CreateUserFormProps) {
-  const router = useRouter();
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const queryClient = useQueryClient();
   const form = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
@@ -40,7 +40,6 @@ export default function CreateUserForm({
   });
 
   const onSubmit = async (data: CreateUserFormData) => {
-    onLoading?.(true);
     try {
       const res = await createClientAction({
         fullName: data.name,
@@ -56,86 +55,38 @@ export default function CreateUserForm({
 
       toast.success("Cliente creado correctamente");
       await queryClient.invalidateQueries({ queryKey: ["clients"] });
-
-      onSuccess?.();
+      setIsDrawerOpen(false);
     } catch (error) {
-      toast.error("Ocurrió un error inesperado");
-    } finally {
-      onLoading?.(false);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+      toast.error(`Ocurrió un error inesperado`);
     }
   };
 
   return (
-    <div className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6">
-      <form id="create-user-form" onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup className="pb-2">
-          <Controller
-            name="name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Nombre del usuario</FieldLabel>
-                <Input {...field} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          ></Controller>
-          <Controller
-            name="gmail"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Correo Electrónico</FieldLabel>
-                <Input {...field} placeholder="" />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          ></Controller>
-          <Controller
-            name="phone"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Número de teléfono</FieldLabel>
-                <Input {...field} placeholder="" type="number" />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          ></Controller>
-          <Controller
-            name="password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Contraseña</FieldLabel>
-                <Input {...field} placeholder="" type="password" />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          ></Controller>
-          <Controller
-            name="confirmPassword"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Confirmar Contraseña</FieldLabel>
-                <Input {...field} placeholder="" type="password" />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          ></Controller>
-        </FieldGroup>
-      </form>
-    </div>
+    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <DrawerTrigger asChild className="w-full flex">
+        {children}
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Crear Usuario</DrawerTitle>
+        </DrawerHeader>
+        <div className="w-full overflow-auto max-w-lg mx-auto px-6 pb-6">
+          <form id="create-user-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <UserForm form={form} />
+          </form>
+        </div>
+        <DrawerFooter>
+          <Button type="submit" form="create-user-form" className="w-full">
+            Guardar Usuario
+          </Button>
+          <DrawerClose asChild>
+            <Button variant="secondary">Atrás</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

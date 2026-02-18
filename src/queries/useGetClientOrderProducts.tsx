@@ -1,11 +1,12 @@
-import {
-  getClientOrderProductsAction,
-} from "@/features/actions/OrdersController.actions";
+import { getClientOrderProductsAction } from "@/features/actions/OrdersController.actions";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useClientGetOrderProducts(orderId: string) {
+export default function useGetClientOrderProducts(
+  orderId: string,
+  enabled: boolean = true
+) {
   return useQuery({
-    queryKey: ["client-products", orderId],
+    queryKey: ["orders", orderId, "products"],
     queryFn: async () => {
       const res = await getClientOrderProductsAction(orderId);
 
@@ -18,5 +19,6 @@ export default function useClientGetOrderProducts(orderId: string) {
           throw new Error(`${res.error.code}: ${res.error.message}`);
       }
     },
+    enabled,
   });
 }

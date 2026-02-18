@@ -3,23 +3,40 @@ import OrderStatusSummary from "./OrderStatusSummary";
 import { useSearchParams } from "next/navigation";
 import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
 import { Spinner } from "@/app/__components/ui/spinner";
-import { Button } from "@/app/__components/ui/button";
-import { Plus } from "lucide-react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/app/__components/ui/empty";
+import { ClipboardPlusIcon } from "lucide-react";
 
 export default function OrderAdminPanel() {
   const searchParams = useSearchParams();
 
-  const clientNameFilter = searchParams.get("clientName") ?? undefined;
-  const clientNumberFilter = searchParams.get("clientNumber") ?? undefined;
+  const trackingNumber = searchParams.get("trackingNumber") ?? undefined;
+  const clientName = searchParams.get("clientName") ?? undefined;
+  const clientNumber = searchParams.get("clientNumber") ?? undefined;
+  const productId = searchParams.get("productId") ?? undefined;
+  const ignoreCancelled = searchParams.get("ignoreCancelled") === "true";
+  const ignoreDelievered = searchParams.get("ignoreDelievered") === "true";
+  const createdAfter = searchParams.get("createdAfter") ?? undefined;
+  const createdBefore = searchParams.get("createdBefore") ?? undefined;
 
-  const ordersQuery = useFindOrdersQuery({
-    trackingNumber: searchParams.get("trackingNumber") ?? undefined,
-    clientName: searchParams.get("clientName") ?? undefined,
-    clientNumber: searchParams.get("clientNumber") ?? undefined,
-    productId: searchParams.get("productId") ?? undefined,
-    ignoreCancelled: false,
-    ignoreDelievered: false,
-  });
+  const req = {
+    trackingNumber,
+    clientName,
+    clientNumber,
+    productId,
+    ignoreCancelled,
+    ignoreDelievered,
+    createdAfter: createdAfter ? new Date(createdAfter) : undefined,
+    createdBefore: createdBefore ? new Date(createdBefore) : undefined,
+  };
+  const isFiltered = Object.values(req).some(Boolean);
+
+  const ordersQuery = useFindOrdersQuery(req);
 
   if (ordersQuery.isError) {
     return (
@@ -37,28 +54,29 @@ export default function OrderAdminPanel() {
     );
   }
 
-  return (
-    <>
-      <div className="w-full">
-        {(clientNameFilter || clientNumberFilter) && (
-          <div className="flex items-center w-full gap-2 mb-6 p-2 ">
-            <span className="text-xl">
-              Pedidos de {clientNameFilter ?? clientNumberFilter}
-            </span>{" "}
-          </div>
-        )}
+  if (ordersQuery.data.length == 0) {
+    return (
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <ClipboardPlusIcon />
+          </EmptyMedia>
+          <EmptyTitle>No hay pedidos</EmptyTitle>
+          <EmptyDescription>
+            {isFiltered
+              ? "No se encontraron pedidos que coincidan con los requisitos de búsqueda."
+              : "Aún no hay pedidos registrados. Pide a tus clientes que creen uno nuevo."}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
 
-        {ordersQuery.data.length == 0 && <p>Aún no hay pedidos</p>}
-        {ordersQuery.data.map((order) => (
-          <OrderStatusSummary key={order.id} order={order} />
-        ))}
-      </div>
-      <Button
-        className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
-        title="Añadir Pedido"
-      >
-        <Plus className="size-6" />
-      </Button>
-    </>
+  return (
+    <div className="w-full">
+      {ordersQuery.data.map((order) => (
+        <OrderStatusSummary key={order.id} order={order} />
+      ))}
+    </div>
   );
 }

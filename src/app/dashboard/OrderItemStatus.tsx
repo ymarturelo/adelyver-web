@@ -3,8 +3,6 @@ import { ChevronRightIcon } from "lucide-react";
 import CircularProgress from "../__components/CircularProgress";
 import Link from "next/link";
 import { OrderStatus, getOrderStatusInfo } from "@/features/models/OrderModel";
-import { Spinner } from "../__components/ui/spinner";
-import useClientGetOrderProducts from "@/queries/useClientGetOrderProducts";
 
 type OrderItemStatusProps = {
   orderStatus: OrderStatus;

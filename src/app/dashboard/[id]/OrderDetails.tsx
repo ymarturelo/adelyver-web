@@ -52,15 +52,17 @@ export default function OrderDetails() {
           shopCartUrl={orderQuery.data.shopCartUrl}
         />
       )}
-      <ProductsLinks orderId={orderId}></ProductsLinks>
-      <div className="grid grid-cols-[1fr_auto] items-center text-end ml-20 gap-x-4">
-        <p className="">precio del pedido:</p>
-        <p className="text-4xl">${orderQuery.data.packagePrice}</p>
-        <p className="">precio del envío:</p>
-        <p className="text-4xl">${orderQuery.data.deliveryPrice}</p>
-        <p className="">ya pagado:</p>
-        <p className="text-4xl">${orderQuery.data.moneyPaidByClient}</p>
-      </div>
+      <ProductsLinks order={orderQuery.data} />
+      {orderQuery.data.status !== "pending_review" && (
+        <div className="grid grid-cols-[1fr_auto] items-center text-end ml-20 gap-x-4">
+          <p className="">precio del pedido:</p>
+          <p className="text-4xl">${orderQuery.data.packagePrice}</p>
+          <p className="">precio del envío:</p>
+          <p className="text-4xl">${orderQuery.data.deliveryPrice}</p>
+          <p className="">ya pagado:</p>
+          <p className="text-4xl">${orderQuery.data.moneyPaidByClient}</p>
+        </div>
+      )}
     </div>
   );
 }

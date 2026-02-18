@@ -1,7 +1,4 @@
-import {
-  UpdateOrderByAdminRequest,
-  UpdateProductRequest,
-} from "@/features/abstractions/IOrderController";
+import { UpdateOrderByAdminRequest } from "@/features/abstractions/IOrderController";
 import { updateOrderByAdminAction } from "@/features/actions/OrdersController.actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -9,7 +6,6 @@ export function useUpdateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    
     mutationFn: async (req: UpdateOrderByAdminRequest) => {
       const res = await updateOrderByAdminAction(req);
 
@@ -20,7 +16,10 @@ export function useUpdateOrder() {
       return res.data;
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["client-orders"] });
+      await queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: (err) => {
+      console.error(err);
     },
   });
 }

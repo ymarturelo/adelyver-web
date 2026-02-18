@@ -24,6 +24,7 @@ import { Spinner } from "@/app/__components/ui/spinner";
 import { useUpdateOrder } from "@/mutations/useUpdateAdminOrder";
 import CircularProgress from "@/app/__components/CircularProgress";
 import CreateProductForm from "./CreateProductForm";
+import ProductAdminEdit from "./ProductAdminEdit";
 
 type OrderStatusSummaryProps = {
   order: OrderModel;
@@ -33,13 +34,6 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
 
   const { label, progress, color } = getOrderStatusInfo(order.status);
 
-  const handleCancelOrder = () => {
-    updateOrderMutation.mutate({
-      orderId: order.id,
-      status: "cancelled",
-    });
-  };
-
   return (
     <Accordion type="single" collapsible className="max-w-lg">
       <AccordionItem className="" value="shipping">
@@ -47,7 +41,7 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
           <div>
             <CircularProgress size={64} progress={progress} color={color} />
           </div>
-          <AccordionTrigger className=" ... [&>svg]:h-6 [&>svg]:w-6 w-[100%] text-gray-400 hover:no-underline hover:text-primary transition-colors">
+          <AccordionTrigger className="[&>svg]:h-6 [&>svg]:w-6 w-[100%] text-gray-400 hover:no-underline hover:text-primary transition-colors">
             <div className="text-left">
               <h3 className="text-xl">{label}</h3>
               <p className="font-light text-sm">
@@ -65,6 +59,7 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
           <div className="col-span-2">
             <AccordionContent>
               <OrderEditForm order={order} />
+              <ProductAdminEdit orderId={order.id} />
               <div className="grid gap-y-5 mt-10 ">
                 <CreateProductForm orderId={order.id} />
                 <Drawer>
@@ -82,7 +77,12 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
                     <DrawerFooter>
                       <Button
                         variant="destructive"
-                        onClick={handleCancelOrder}
+                        onClick={() =>
+                          updateOrderMutation.mutate({
+                            orderId: order.id,
+                            status: "cancelled",
+                          })
+                        }
                         disabled={updateOrderMutation.isPending}
                       >
                         {updateOrderMutation.isPending && (
