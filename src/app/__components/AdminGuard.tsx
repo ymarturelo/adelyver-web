@@ -1,5 +1,5 @@
 import { isAdmin } from "@/features/actions/ClientsController.actions";
-import { ShieldX } from "lucide-react";
+import { ArrowRight, ShieldX } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
@@ -34,7 +34,10 @@ export default async function AdminGuard({
           Para acceder a esta página debes ser administrador.
         </p>
         <Button variant="link" asChild>
-          <Link href="/auth/login">Volver a autenticarse</Link>
+          <Link href="/auth/login">
+            Volver a autenticarse
+            <ArrowRight />
+          </Link>
         </Button>
       </header>
     );

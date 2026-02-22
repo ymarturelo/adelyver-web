@@ -15,6 +15,10 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+
+    if (error.code === "otp_expired") {
+      return NextResponse.redirect(`${origin}/auth/otp-expired`);
+    }
   }
 
   // If something went wrong, send them to an error page

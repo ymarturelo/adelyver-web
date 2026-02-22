@@ -19,13 +19,12 @@ import {
 } from "@/app/__schemas/findOrdersFilterForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { Calendar } from "@/app/__components/ui/calendar";
 import { CalendarIcon, Search } from "lucide-react";
-import { Checkbox } from "@/app/__components/ui/checkbox";
 import { Spinner } from "@/app/__components/ui/spinner";
+import { Switch } from "@/app/__components/ui/switch";
 
 export default function FindOrderFilter() {
   const router = useRouter();
@@ -58,172 +57,181 @@ export default function FindOrderFilter() {
       params.set("createdBefore", format(data.createdBefore, "yyyy-MM-dd"));
     }
 
-    // if (data.ignoreDelivered) params.set("ignoreDelivered", "true");
-
     router.push(`/admin/orders?${params.toString()}`);
   };
 
   return (
-    <div className="w-full max-w-lg px-6 pb-6 grid grid-rows-[auto_1fr]">
-      <h1 className="mb-8 text-center text-xl">Búsqueda de pedidos</h1>
-      <form
-        id="find-orders-filter-form"
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-rows-auto"
-      >
-        <FieldGroup className="pb-2">
-          <Controller
-            name="trackingNumber"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Número de seguimiento</FieldLabel>
-                <Input type="text" {...field} value={field.value ?? ""} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="productId"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Id del producto</FieldLabel>
-                <Input type="text" {...field} value={field.value ?? ""} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="clientName"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Nombre del cliente</FieldLabel>
-                <Input type="text" {...field} value={field.value ?? ""} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="clientNumber"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Número del cliente</FieldLabel>
-                <Input type="text" {...field} value={field.value ?? ""} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-        </FieldGroup>
-        <div className="grid grid-cols-[auto_auto] gap-15 mt-10">
-          <Controller
-            name="createdBefore"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="date-picker-simple">
-                  Creado antes de :
-                </FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className="gap-2 data-[empty-true]:text-muted-foreground w-[212px] justify-between font-normal text-muted-foreground"
-                    >
-                      <span className="">
-                        {field.value
-                          ? format(field.value, "PP")
-                          : "Seleccionar fecha"}
-                      </span>
-                      <CalendarIcon className="size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ?? undefined}
-                      onSelect={field.onChange}
-                      defaultMonth={field.value ?? undefined}
-                      disabled={(date) => date > new Date()}
-                    ></Calendar>
-                  </PopoverContent>
-                </Popover>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="createdAfter"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Creado después de:</FieldLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className="gap-1 data-[empty-true]:text-muted-foreground w-[212px] justify-between font-normal text-muted-foreground"
-                    >
-                      <span className="">
-                        {field.value
-                          ? format(field.value, "PP")
-                          : "Seleccionar fecha"}
-                      </span>
-                      <CalendarIcon className="size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ?? undefined}
-                      onSelect={field.onChange}
-                      defaultMonth={field.value ?? undefined}
-                      disabled={(date) => date > new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-        </div>
+    <form
+      id="find-orders-filter-form"
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="grid grid-rows-auto"
+    >
+      <FieldGroup className="pb-2">
+        <Controller
+          name="trackingNumber"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Número de seguimiento</FieldLabel>
+              <Input type="text" {...field} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="productId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Id del producto</FieldLabel>
+              <Input type="text" {...field} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="clientName"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Nombre del cliente</FieldLabel>
+              <Input type="text" {...field} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="clientNumber"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Número del cliente</FieldLabel>
+              <Input type="text" {...field} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="createdBefore"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="date-picker-simple">
+                Creado antes de :
+              </FieldLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className="gap-2 data-[empty-true]:text-muted-foreground w-[212px] justify-between font-normal text-muted-foreground"
+                  >
+                    <span className="">
+                      {field.value
+                        ? format(field.value, "PP")
+                        : "Seleccionar fecha"}
+                    </span>
+                    <CalendarIcon className="size-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value ?? undefined}
+                    onSelect={field.onChange}
+                    defaultMonth={field.value ?? undefined}
+                    disabled={(date) => date > new Date()}
+                  ></Calendar>
+                </PopoverContent>
+              </Popover>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="createdAfter"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Creado después de:</FieldLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className="gap-1 data-[empty-true]:text-muted-foreground w-[212px] justify-between font-normal text-muted-foreground"
+                  >
+                    <span className="">
+                      {field.value
+                        ? format(field.value, "PP")
+                        : "Seleccionar fecha"}
+                    </span>
+                    <CalendarIcon className="size-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value ?? undefined}
+                    onSelect={field.onChange}
+                    defaultMonth={field.value ?? undefined}
+                    disabled={(date) => date > new Date()}
+                  />
+                </PopoverContent>
+              </Popover>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
 
-        <FieldGroup className="mt-15">
-          <Field orientation={"horizontal"}>
-            <Checkbox
-              id="ignoreDelivered-checkbox"
-              name="ignoreDelivered-checkbox"
-              className="size-5"
-            />
-            <FieldLabel htmlFor="ignoreDelivered-checkbox" className="text-sm">
-              Ignorar recogidos
-            </FieldLabel>
-          </Field>
-        </FieldGroup>
-        <div className="flex justify-end mt-auto">
-          <Button
-            type="submit"
-            className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
-            title="Encontrar pedido  "
-          >
-            {isSubmitting ? <Spinner /> : <Search className="size-6" />}
-          </Button>
-        </div>
-      </form>
-    </div>
+      <FieldGroup className="mt-15">
+        <Controller
+          control={form.control}
+          name="ignoreDelivered"
+          render={({ field }) => (
+            <Field orientation={"horizontal"}>
+              <Switch
+                {...field}
+                name="ignoreDelivered-checkbox"
+                onCheckedChange={field.onChange}
+                value={field.value ? "true" : "false"}
+              />
+              <FieldLabel
+                htmlFor="ignoreDelivered-checkbox"
+                className="text-sm"
+              >
+                Ignorar recogidos
+              </FieldLabel>
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="ignoreDelivered"
+          render={({ field }) => (
+            <Field orientation={"horizontal"}>
+              <Switch
+                {...field}
+                name="ignoreDelivered-checkbox"
+                onCheckedChange={field.onChange}
+                value={field.value ? "true" : "false"}
+              />
+              <FieldLabel
+                htmlFor="ignoreDelivered-checkbox"
+                className="text-sm"
+              >
+                Ignorar entregados
+              </FieldLabel>
+            </Field>
+          )}
+        />
+      </FieldGroup>
+      <Button
+        type="submit"
+        className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
+        title="Encontrar pedido  "
+      >
+        {isSubmitting ? <Spinner /> : <Search className="size-6" />}
+      </Button>
+    </form>
   );
 }

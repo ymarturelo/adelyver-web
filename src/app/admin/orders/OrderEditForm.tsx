@@ -52,6 +52,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
       toast.error(res.error.message);
     } else {
       await queryClient.invalidateQueries({ queryKey: ["orders"] });
+      form.reset(data);
     }
   };
 
@@ -169,10 +170,6 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
               onClick={() => form.reset()}
               disabled={form.formState.isSubmitting}
             >
-              <Spinner
-                data-icon="inline-start"
-                className={cn(!form.formState.isSubmitting && "hidden")}
-              />
               Deshacer
             </Button>
           </div>

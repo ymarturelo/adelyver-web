@@ -12,7 +12,8 @@ export const findOrdersFilterFormSchema = z
     createdAfter: z.date().nullable().optional(),
     createdBefore: z.date().nullable().optional(),
 
-    //ignoreDelivered: z.boolean().default(false),
+    ignoreDelivered: z.boolean(),
+    ignoreCancelled: z.boolean(),
   })
   .superRefine((data, ctx) => {
     if (data.createdAfter && data.createdBefore) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "../__components/ui/button";
-import { ClipboardPlusIcon, Plus } from "lucide-react";
+import { ClipboardPlusIcon } from "lucide-react";
 import OrderItemStatus from "./OrderItemStatus";
 import { Spinner } from "../__components/ui/spinner";
 import useGetClientAllOrders from "@/queries/useGetClientAllOrdersQuery";
