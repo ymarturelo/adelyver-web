@@ -1,6 +1,5 @@
 import { eq, sql, desc, exists, and, ilike } from "drizzle-orm";
 import IOrdersController, {
-  ClientOrderDto,
   FindOrdersRequest,
   CreateOrderByClientRequest,
   CreateOrderByAdminRequest,
@@ -8,23 +7,29 @@ import IOrdersController, {
   CreateProductRequest,
   UpdateProductRequest,
   UpdateOrderByClientRequest,
+  OrderDto,
+  ClientOrderDto,
 } from "../abstractions/IOrderController";
 import { Result } from "../shared/Result";
-import { ProductModel } from "../models/ProductModel";
-import { OrderModel } from "../models/OrderModel";
 import { randomUUID } from "crypto";
 import { orders, products, userSearch } from "./db/schema";
 import { db, TransactionType } from "./db";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const createSupabaseOrdersController = (
   tx: TransactionType
 ): IOrdersController => {
   return {
-    getClientOrderById: async (
-      orderId: string
-    ): Promise<Result<ClientOrderDto>> => {
+    getClientOrderById: async (orderId: string) => {
       const data = await tx.query.orders.findFirst({
         where: eq(orders.id, orderId),
+        with: {
+          products: {
+            columns: {
+              name: true,
+            },
+          },
+        },
       });
 
       if (!data)
@@ -32,6 +37,9 @@ export const createSupabaseOrdersController = (
           code: "NOT_FOUND",
           message: "Pedido no encontrado",
         });
+
+      const supabase = supabaseAdmin();
+      const client = await supabase.auth.admin.getUserById(data.clientId);
 
       return Result.ok({
         id: data.id,
@@ -42,35 +50,56 @@ export const createSupabaseOrdersController = (
         spentMoney: data.investedAmount,
         moneyPaidByClient: data.paidAmount,
         shopCartUrl: data.shopCartUrl,
+        createdBy:
+          client.data.user?.user_metadata?.full_name ?? "UNKNOWN_CLIENT",
+        productSummary: data.products.map((p) => p.name).join(", "),
         createdAt: data.createdAt,
         updatedAt: data.createdAt,
       });
     },
 
-    getClientAllOrders: async (): Promise<Result<ClientOrderDto[]>> => {
+    getClientAllOrders: async () => {
       const data = await tx.query.orders.findMany({
         orderBy: orders.updatedAt,
+        with: {
+          products: {
+            columns: {
+              name: true,
+            },
+          },
+        },
       });
 
+      const supabase = supabaseAdmin();
+      const clients: string[] = [];
+      for (const d of data) {
+        const user = await supabase.auth.admin.getUserById(d.clientId);
+        const name =
+          user.data.user?.user_metadata?.full_name ?? "UNKNOWN_CLIENT";
+        clients.push(name);
+      }
+
       return Result.ok(
-        data.map((d) => ({
-          id: d.id,
-          clientId: d.clientId,
-          status: d.status,
-          packagePrice: d.packageCost,
-          deliveryPrice: d.shippingCost,
-          spentMoney: d.investedAmount,
-          moneyPaidByClient: d.paidAmount,
-          shopCartUrl: d.shopCartUrl,
-          createdAt: d.createdAt,
-          updatedAt: d.createdAt,
-        }))
+        data.map(
+          (d, index) =>
+            ({
+              id: d.id,
+              clientId: d.clientId,
+              status: d.status,
+              packagePrice: d.packageCost,
+              deliveryPrice: d.shippingCost,
+              moneyPaidByClient: d.paidAmount,
+              shopCartUrl: d.shopCartUrl,
+              createdBy: clients[index],
+              productSummary: d.products.map((p) => p.name).join(", "),
+              createdAt: d.createdAt,
+              updatedAt: d.createdAt,
+            } satisfies ClientOrderDto)
+        )
       );
     },
 
-    getClientOrderProducts: async (
-      orderId: string
-    ): Promise<Result<ProductModel[]>> => {
+    getClientOrderProducts: async (orderId: string) => {
       const data = await tx.query.products.findMany({
         where: eq(products.orderId, orderId),
       });
@@ -89,11 +118,15 @@ export const createSupabaseOrdersController = (
       );
     },
 
-    findOrders: async (
-      req: FindOrdersRequest
-    ): Promise<Result<OrderModel[]>> => {
-      console.log("req", req);
+    findOrders: async (req: FindOrdersRequest) => {
       const query = tx.query.orders.findMany({
+        with: {
+          products: {
+            columns: {
+              name: true,
+            },
+          },
+        },
         where: () => {
           const conditions = [];
 
@@ -172,18 +205,24 @@ export const createSupabaseOrdersController = (
           // if (req.ignoreDelievered)
           //   conditions.push(ne(row.status, "delivered"));
 
-          console.log("conditions", conditions);
           return and(...conditions);
         },
         orderBy: desc(orders.updatedAt),
       });
 
-      console.log("query", query.toSQL());
       const data = await query;
+      const supabase = supabaseAdmin();
+      const clients: string[] = [];
+      for (const d of data) {
+        const user = await supabase.auth.admin.getUserById(d.clientId);
+        const name =
+          user.data.user?.user_metadata?.full_name ?? "UNKNOWN_CLIENT";
+        clients.push(name);
+      }
 
       return Result.ok(
         data.map(
-          (i) =>
+          (i, index) =>
             ({
               id: i.id,
               clientId: i.clientId,
@@ -195,14 +234,14 @@ export const createSupabaseOrdersController = (
               createdAt: i.createdAt,
               updatedAt: i.createdAt,
               shopCartUrl: i.shopCartUrl,
-            } satisfies OrderModel)
+              createdBy: clients[index],
+              productSummary: i.products.map((p) => p.name).join(", "),
+            } satisfies OrderDto)
         )
       );
     },
 
-    createOrderByClient: async (
-      req: CreateOrderByClientRequest
-    ): Promise<Result<void>> => {
+    createOrderByClient: async (req: CreateOrderByClientRequest) => {
       await tx.insert(orders).values({
         id: randomUUID(),
         status: "pending_review",
@@ -212,9 +251,7 @@ export const createSupabaseOrdersController = (
       return Result.ok(undefined);
     },
 
-    createOrderByAdmin: async (
-      req: CreateOrderByAdminRequest
-    ): Promise<Result<{ id: string }>> => {
+    createOrderByAdmin: async (req: CreateOrderByAdminRequest) => {
       const id = randomUUID();
       await tx.insert(orders).values({
         id,
@@ -227,9 +264,7 @@ export const createSupabaseOrdersController = (
       return Result.ok({ id });
     },
 
-    updateOrderByClient: async (
-      req: UpdateOrderByClientRequest
-    ): Promise<Result<void>> => {
+    updateOrderByClient: async (req: UpdateOrderByClientRequest) => {
       const data = await tx.query.orders.findFirst({
         where: eq(orders.id, req.orderId),
       });
@@ -257,9 +292,7 @@ export const createSupabaseOrdersController = (
       return Result.ok(undefined);
     },
 
-    updateOrderByAdmin: async (
-      req: UpdateOrderByAdminRequest
-    ): Promise<Result<void>> => {
+    updateOrderByAdmin: async (req: UpdateOrderByAdminRequest) => {
       await tx
         .update(orders)
         .set({
@@ -275,9 +308,7 @@ export const createSupabaseOrdersController = (
       return Result.ok(undefined);
     },
 
-    createProductByAdmin: async (
-      req: CreateProductRequest
-    ): Promise<Result<void>> => {
+    createProductByAdmin: async (req: CreateProductRequest) => {
       await tx.insert(products).values({
         id: randomUUID(),
         orderId: req.orderId,
@@ -289,9 +320,7 @@ export const createSupabaseOrdersController = (
       return Result.ok(undefined);
     },
 
-    updateProductByAdmin: async (
-      req: UpdateProductRequest
-    ): Promise<Result<void>> => {
+    updateProductByAdmin: async (req: UpdateProductRequest) => {
       await tx
         .update(products)
         .set({
@@ -305,7 +334,7 @@ export const createSupabaseOrdersController = (
       return Result.ok(undefined);
     },
 
-    deleteProductByAdmin: async (id: string): Promise<Result<void>> => {
+    deleteProductByAdmin: async (id: string) => {
       await tx.delete(products).where(eq(products.id, id));
       return Result.ok(undefined);
     },

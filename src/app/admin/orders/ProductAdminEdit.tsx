@@ -15,7 +15,8 @@ import useGetClientOrderProducts from "@/queries/useGetClientOrderProducts";
 import { Spinner } from "@/app/__components/ui/spinner";
 import { deleteProductByAdminAction } from "@/features/actions/OrdersController.actions";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import EditProductForm from "./EditProductForm";
 
 type ProductAdminEditProps = {
   orderId: string;
@@ -40,12 +41,16 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
     toast.success("Producto eliminado correctamente");
   };
 
+  const removeProductMutation = useMutation({
+    mutationFn: onRemoveProduct,
+  });
+
   if (productsQuery.isError) {
     return <p>Error al cargar productos</p>;
   }
   if (productsQuery.isLoading || !productsQuery.data) {
     return (
-      <div className="py-8">
+      <div className="py-8 flex gap-2">
         <Spinner />
         <span>Cargando productos...</span>
       </div>
@@ -105,9 +110,8 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
                       variant={"ghost"}
                       size={"icon"}
                       className=" h-9 w-9 hover:text-destructive"
-                      onClick={() => onRemoveProduct(product.id)}
                     >
-                      <Trash2 size={18}></Trash2>
+                      <Trash2 size={18} />
                     </Button>
                   </DrawerTrigger>
                   <DrawerContent>
@@ -119,38 +123,28 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
                       </DrawerDescription>
                     </DrawerHeader>
                     <DrawerFooter>
-                      <Button variant="destructive">Eliminar Producto</Button>
+                      <Button
+                        onClick={() => removeProductMutation.mutate(product.id)}
+                        variant="destructive"
+                      >
+                        Eliminar Producto
+                      </Button>
                       <DrawerClose asChild>
                         <Button variant="ghost">Atrás</Button>
                       </DrawerClose>
                     </DrawerFooter>
                   </DrawerContent>
                 </Drawer>
-                <Drawer>
-                  <DrawerTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 hover:text-primary"
-                    >
-                      <Pencil size={18} />
-                    </Button>
-                  </DrawerTrigger>
-                  <DrawerContent className="max-h-[90vh]">
-                    <div className="flex flex-col h-full max-w-lg mx-auto w-full overflow-hidden">
-                      <DrawerHeader>
-                        <DrawerTitle>Editar Producto</DrawerTitle>
-                      </DrawerHeader>
-                      <DrawerFooter className="border-t bg-background">
-                        <Button>Guardar Cambios</Button>
-                        <DrawerClose asChild>
-                          <Button variant="ghost">Atrás</Button>
-                        </DrawerClose>
-                      </DrawerFooter>
-                    </div>
-                  </DrawerContent>
-                </Drawer>
+                <EditProductForm product={product}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 hover:text-primary"
+                  >
+                    <Pencil size={18} />
+                  </Button>
+                </EditProductForm>
               </div>
             </div>
           ))}

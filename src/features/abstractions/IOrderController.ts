@@ -9,7 +9,7 @@ export default interface IOrdersController {
 
   getClientOrderProducts: (orderId: string) => Promise<Result<ProductModel[]>>;
 
-  findOrders: (req: FindOrdersRequest) => Promise<Result<OrderModel[]>>;
+  findOrders: (req: FindOrdersRequest) => Promise<Result<OrderDto[]>>;
 
   createOrderByClient: (
     req: CreateOrderByClientRequest
@@ -32,7 +32,12 @@ export default interface IOrdersController {
   deleteProductByAdmin: (id: string) => Promise<Result<void>>;
 }
 
-export type ClientOrderDto = Omit<OrderModel, "spentMoney">;
+export type OrderDto = OrderModel & {
+  productSummary: string;
+  createdBy: string;
+};
+
+export type ClientOrderDto = Omit<OrderDto, "spentMoney">;
 
 export type FindOrdersRequest = {
   trackingNumber?: string;

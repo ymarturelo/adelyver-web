@@ -26,9 +26,10 @@ import CircularProgress from "@/app/__components/CircularProgress";
 import CreateProductForm from "./CreateProductForm";
 import ProductAdminEdit from "./ProductAdminEdit";
 import { BanIcon } from "lucide-react";
+import { OrderDto } from "@/features/abstractions/IOrderController";
 
 type OrderStatusSummaryProps = {
-  order: OrderModel;
+  order: OrderDto;
 };
 export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
   const updateOrderMutation = useUpdateOrder();
@@ -52,9 +53,11 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
                   month: "numeric",
                   year: "2-digit",
                 })}
-                {` por CLIENT_NAME`}
+                {` por ${order.createdBy}`}
               </p>
-              <p className="font-light text-sm line-clamp-1">PRODUCT_SUMMARY</p>
+              <p className="font-light text-sm line-clamp-1">
+                {order.productSummary}
+              </p>
             </div>
           </AccordionTrigger>
           <div className="col-span-2">
