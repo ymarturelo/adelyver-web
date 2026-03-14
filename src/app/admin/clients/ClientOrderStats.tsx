@@ -16,6 +16,7 @@ import {
 } from "../../__schemas/updateClientName.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "../../__lib/utils";
+import { Check } from "lucide-react";
 
 type ClientOrderStatsProps = {
   initialName: string;
@@ -102,6 +103,7 @@ export default function ClientOrderStats({
                 data-icon="inline-start"
                 className={cn(!form.formState.isSubmitting && "hidden")}
               />
+              <Check />
               Guardar cambios
             </Button>
           )}

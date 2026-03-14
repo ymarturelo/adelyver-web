@@ -37,7 +37,7 @@ export default function ProductsLinks({ order }: productLinkProps) {
   }
 
   return (
-    <div className="grid grid-cols-[1fr_auto] mt-20 gap-x-4 gap-y-1">
+    <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1">
       {productQuery.data.map((product, index) => (
         <React.Fragment key={product.id || index}>
           <h3 className="text-xl font-medium">{product.name}</h3>
@@ -46,10 +46,7 @@ export default function ProductsLinks({ order }: productLinkProps) {
             target="_blank"
             className="row-span-2 place-self-center"
           >
-            <SquareArrowOutUpRight
-              size={28}
-              className="hover:text-primary transition-colors self-start"
-            />
+            <SquareArrowOutUpRight className="hover:text-primary transition-colors self-start size-6" />
           </Link>
           <p className="font-light text-sm col-start-1 truncate">
             {product.url}

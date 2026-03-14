@@ -41,7 +41,6 @@ export default function FindClientForm() {
 
   return (
     <div className="w-full max-w-lg px-6 pb-6 grid grid-rows-[auto_1fr]">
-      <h1 className="mb-5 text-center text-xl">Clientes</h1>
       <form
         id="find-client-form"
         onSubmit={form.handleSubmit(onSubmit)}
@@ -77,6 +76,7 @@ export default function FindClientForm() {
         </FieldGroup>
         <div className="flex justify-end mt-auto">
           <Button
+            type="submit"
             className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"
             title="Encontrar cliente  "
           >

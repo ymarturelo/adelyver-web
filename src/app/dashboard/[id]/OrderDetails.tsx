@@ -36,7 +36,7 @@ export default function OrderDetails() {
 
   return (
     <div className="px-6 w-full max-w-2xl grid gap-4">
-      <div className="mr-auto grid grid-cols-[auto_1fr_auto] gap-y-1 gap-x-4 py-4">
+      <div className="mr-auto grid grid-cols-[auto_1fr_auto] gap-y-1 gap-x-4 py-4 mt-0">
         <div className="row-span-3 h-fit place-self-center">
           <CircularProgress size={64} status={orderQuery.data.status} />
         </div>
@@ -54,13 +54,13 @@ export default function OrderDetails() {
       )}
       <ProductsLinks order={orderQuery.data} />
       {orderQuery.data.status !== "pending_review" && (
-        <div className="grid grid-cols-[1fr_auto] items-center text-end ml-20 gap-x-4">
+        <div className="grid grid-cols-[1fr_auto] items-center text-end ml-20 gap-x-4 mt-5">
           <p className="">precio del pedido:</p>
-          <p className="text-4xl">${orderQuery.data.packagePrice}</p>
+          <p className="text-3xl">${orderQuery.data.packagePrice}</p>
           <p className="">precio del envío:</p>
-          <p className="text-4xl">${orderQuery.data.deliveryPrice}</p>
+          <p className="text-3xl">${orderQuery.data.deliveryPrice}</p>
           <p className="">ya pagado:</p>
-          <p className="text-4xl">${orderQuery.data.moneyPaidByClient}</p>
+          <p className="text-3xl">${orderQuery.data.moneyPaidByClient}</p>
         </div>
       )}
     </div>

@@ -1,5 +1,11 @@
 "use client";
-import { ExternalLinkIcon, Pencil, Trash2 } from "lucide-react";
+import {
+  BanIcon,
+  ChevronLeft,
+  ExternalLinkIcon,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/app/__components/ui/button";
 import {
   Drawer,
@@ -127,10 +133,18 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
                         onClick={() => removeProductMutation.mutate(product.id)}
                         variant="destructive"
                       >
+                        {removeProductMutation.isPending ? (
+                          <Spinner data-icon="inline-start" />
+                        ) : (
+                          <BanIcon />
+                        )}
                         Eliminar Producto
                       </Button>
                       <DrawerClose asChild>
-                        <Button variant="ghost">Atrás</Button>
+                        <Button variant="ghost">
+                          <ChevronLeft />
+                          Atrás
+                        </Button>
                       </DrawerClose>
                     </DrawerFooter>
                   </DrawerContent>

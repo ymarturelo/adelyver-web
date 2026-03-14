@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createOrderByClientAction } from "@/features/actions/OrdersController.actions";
 import { toast } from "sonner";
 import {
+  Drawer,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -17,6 +18,8 @@ import { Button } from "../__components/ui/button";
 import { Spinner } from "../__components/ui/spinner";
 import { cn } from "../__lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { Check } from "lucide-react";
+import { useState } from "react";
 
 export default function CreateOrderForm() {
   const queryClient = useQueryClient();
@@ -63,11 +66,12 @@ export default function CreateOrderForm() {
           form="create-order-form"
           disabled={form.formState.isSubmitting}
         >
-          <Spinner
-            data-icon="inline-start"
-            className={cn(!form.formState.isSubmitting && "hidden")}
-          />
-          Crear pedido
+          {form.formState.isSubmitting ? (
+            <Spinner data-icon="inline-start" />
+          ) : (
+            <Check />
+          )}
+          Crear Pedido
         </Button>
       </DrawerFooter>
     </DrawerContent>

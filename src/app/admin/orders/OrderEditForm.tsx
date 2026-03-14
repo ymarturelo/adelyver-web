@@ -21,6 +21,7 @@ import { updateOrderByAdminAction } from "@/features/actions/OrdersController.ac
 import { getDirtyItemsData } from "@/app/__lib/getDirtyItemsData";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Check, Undo } from "lucide-react";
 
 type OrderEditFormProps = {
   order: OrderModel;
@@ -158,10 +159,11 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
             )}
           >
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              <Spinner
-                data-icon="inline-start"
-                className={cn(!form.formState.isSubmitting && "hidden")}
-              />
+              {form.formState.isSubmitting ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <Check />
+              )}
               Aplicar
             </Button>
             <Button
@@ -170,6 +172,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
               onClick={() => form.reset()}
               disabled={form.formState.isSubmitting}
             >
+              <Undo />
               Deshacer
             </Button>
           </div>

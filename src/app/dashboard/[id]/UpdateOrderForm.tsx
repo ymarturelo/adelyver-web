@@ -12,6 +12,9 @@ import {
 import OrderForm from "../OrderForm";
 import { Button } from "@/app/__components/ui/button";
 import { cn } from "@/app/__lib/utils";
+import { CheckIcon } from "lucide-react";
+import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 
 type UpdateOrderFormProps = {
   orderId: string;
@@ -30,6 +33,8 @@ export default function UpdateOrderForm({
       url: shopCartUrl,
     },
   });
+
+  const router = useRouter();
 
   const onSubmit = async (data: OrderFormData) => {
     const res = await updateOrderByClientAction({
@@ -50,6 +55,7 @@ export default function UpdateOrderForm({
     form.reset({
       url: data.url,
     });
+    router.push("/dashboard");
   };
 
   return (
@@ -67,7 +73,10 @@ export default function UpdateOrderForm({
         {form.formState.isSubmitting ? (
           <span>Actualizando...</span>
         ) : (
-          <span>Actualizar pedido</span>
+          <span className="flex items-center gap-1">
+            <CheckIcon />
+            Actualizar pedido
+          </span>
         )}
       </Button>
     </>

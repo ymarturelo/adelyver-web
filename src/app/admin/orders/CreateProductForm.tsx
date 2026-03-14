@@ -20,7 +20,14 @@ import { Button } from "@/app/__components/ui/button";
 import { Spinner } from "@/app/__components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { PlusIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  ChevronLeft,
+  Plus,
+  PlusIcon,
+  Undo,
+} from "lucide-react";
 
 type CreateProductFormProps = {
   orderId: string;
@@ -78,11 +85,18 @@ export default function CreateProductForm({ orderId }: CreateProductFormProps) {
             form={`new-product-form-${orderId}`}
             disabled={form.formState.isSubmitting}
           >
-            {form.formState.isSubmitting && <Spinner className="mr-2" />}
+            {form.formState.isSubmitting ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <Check />
+            )}
             Añadir
           </Button>
           <DrawerClose asChild>
-            <Button variant="ghost">Atrás</Button>
+            <Button variant="ghost">
+              <ChevronLeft />
+              Atrás
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

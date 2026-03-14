@@ -1,5 +1,6 @@
 import AdminGuard from "../__components/AdminGuard";
 import AuthGuard from "../__components/AuthGuard";
+import Navbar from "./Navbar";
 
 export default async function Layout({
   children,
@@ -8,7 +9,10 @@ export default async function Layout({
 }) {
   return (
     <AuthGuard>
-      <AdminGuard>{children}</AdminGuard>
+      <AdminGuard>
+        <Navbar />
+        {children}
+      </AdminGuard>
     </AuthGuard>
   );
 }

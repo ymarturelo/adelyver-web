@@ -25,13 +25,23 @@ import { useUpdateOrder } from "@/mutations/useUpdateAdminOrder";
 import CircularProgress from "@/app/__components/CircularProgress";
 import CreateProductForm from "./CreateProductForm";
 import ProductAdminEdit from "./ProductAdminEdit";
-import { BanIcon } from "lucide-react";
+import {
+  BanIcon,
+  Check,
+  CheckIcon,
+  ChevronLeft,
+  TriangleAlert,
+  XIcon,
+} from "lucide-react";
 import { OrderDto } from "@/features/abstractions/IOrderController";
+import { useState } from "react";
 
 type OrderStatusSummaryProps = {
   order: OrderDto;
 };
 export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const updateOrderMutation = useUpdateOrder();
 
   const { label } = getOrderStatusInfo(order.status);
@@ -66,7 +76,7 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
               <ProductAdminEdit orderId={order.id} />
               <div className="grid gap-y-5 mt-10 ">
                 <CreateProductForm orderId={order.id} />
-                <Drawer>
+                <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                   <DrawerTrigger asChild>
                     <Button variant="secondary">
                       <BanIcon /> Cancelar Pedido
@@ -84,20 +94,30 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
                       <Button
                         variant="destructive"
                         onClick={() =>
-                          updateOrderMutation.mutate({
-                            orderId: order.id,
-                            status: "cancelled",
-                          })
+                          updateOrderMutation.mutate(
+                            {
+                              orderId: order.id,
+                              status: "cancelled",
+                            },
+                            {
+                              onSuccess: () => setIsDrawerOpen(false),
+                            }
+                          )
                         }
                         disabled={updateOrderMutation.isPending}
                       >
-                        {updateOrderMutation.isPending && (
-                          <Spinner className="mr-2" />
+                        {updateOrderMutation.isPending ? (
+                          <Spinner data-icon="inline-start" />
+                        ) : (
+                          <BanIcon />
                         )}
-                        Confirmar Cancelación
+                        Cancelar Pedido
                       </Button>
                       <DrawerClose asChild>
-                        <Button variant="ghost">Atrás</Button>
+                        <Button variant="ghost">
+                          <ChevronLeft />
+                          Atrás
+                        </Button>
                       </DrawerClose>
                     </DrawerFooter>
                   </DrawerContent>

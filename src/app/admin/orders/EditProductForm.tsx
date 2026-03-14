@@ -22,6 +22,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ProductModel } from "@/features/models/ProductModel";
 import { getDirtyItemsData } from "@/app/__lib/getDirtyItemsData";
+import { CheckIcon, ChevronLeft } from "lucide-react";
 
 type CreateProductFormProps = {
   product: ProductModel;
@@ -81,11 +82,18 @@ export default function EditProductForm({
             form={`update-product-form-${product.id}`}
             disabled={form.formState.isSubmitting}
           >
-            {form.formState.isSubmitting && <Spinner className="mr-2" />}
+            {form.formState.isSubmitting ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <CheckIcon />
+            )}
             Actualizar
           </Button>
           <DrawerClose asChild>
-            <Button variant="ghost">Atrás</Button>
+            <Button variant="ghost">
+              <ChevronLeft />
+              Atrás
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
