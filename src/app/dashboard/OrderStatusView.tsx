@@ -13,7 +13,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "../__components/ui/empty";
-import { Drawer, DrawerTrigger } from "../__components/ui/drawer";
+import { DrawerTrigger } from "../__components/ui/drawer";
 
 
 export default function OrderStatusView() {
@@ -49,11 +49,9 @@ export default function OrderStatusView() {
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Drawer>
           <DrawerTrigger asChild>
             <Button>Crear pedido</Button>
           </DrawerTrigger>
-          </Drawer>
         </EmptyContent>
       </Empty>
     );

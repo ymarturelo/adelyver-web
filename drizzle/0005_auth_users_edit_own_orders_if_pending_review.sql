@@ -1,0 +1,1 @@
+CREATE POLICY "user_edit_own_orders" ON "orders" AS PERMISSIVE FOR UPDATE TO "authenticated" USING (public.get_my_id() = "orders"."client_id" AND "orders"."status" = 'pending_review');
