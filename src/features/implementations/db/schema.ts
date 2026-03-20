@@ -61,6 +61,12 @@ export const orders = pgTable(
       to: "authenticated",
       withCheck: sql`public.get_my_id() = ${table.clientId}`,
     }),
+
+    pgPolicy("user_edit_own_orders", {
+      for: "update",
+      to: "authenticated",
+      using: sql`public.get_my_id() = ${table.clientId} AND ${table.status} = 'pending_review'`,
+    }),
   ]
 );
 

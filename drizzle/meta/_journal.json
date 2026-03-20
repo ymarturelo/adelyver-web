@@ -36,6 +36,13 @@
       "when": 1771905258281,
       "tag": "0004_auth_users_view",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773621270807,
+      "tag": "0005_auth_users_edit_own_orders_if_pending_review",
+      "breakpoints": true
     }
   ]
 }
