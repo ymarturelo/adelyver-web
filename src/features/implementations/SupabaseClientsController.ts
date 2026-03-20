@@ -226,13 +226,17 @@ export const SupabaseClientsController: IClientsController = {
     try {
       const supabase = await supabaseClient();
 
-      const WEB_URL = process.env.WEB_URL!;
+      const headerList = await headers();
+      const host = headerList.get("host");
+      const protocol = headerList.get("x-forwarded-proto") ?? "http";
+
+      const origin = `${protocol}://${host}`;
 
       const { error } = await supabase.auth.signUp({
         email: req.email!,
         password: req.password,
         options: {
-          emailRedirectTo: `${WEB_URL}/auth/verification-callback`,
+          emailRedirectTo: `${origin}/auth/verification-callback`,
           data: {
             full_name: req.fullName,
             phone_number: req.phone,
