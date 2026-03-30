@@ -15,7 +15,6 @@ import {
 } from "../__components/ui/empty";
 import { DrawerTrigger } from "../__components/ui/drawer";
 
-
 export default function OrderStatusView() {
   const ordersQuery = useGetClientAllOrders();
   if (ordersQuery.isError) {
@@ -28,7 +27,7 @@ export default function OrderStatusView() {
 
   if (ordersQuery.isLoading || !ordersQuery.data) {
     return (
-      <span className="grid justify-items-center gap-2">
+      <span className="flex items-center justify-center p-20 gap-3">
         <Spinner />
         <span>Cargando pedidos...</span>
       </span>

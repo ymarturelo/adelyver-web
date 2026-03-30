@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function OrderAdminPanelPage() {
   return (
-    <div className="min-h-dvh grid grid-rows-[auto_1fr]">
+    <div className="grow grid grid-rows-[auto_1fr]">
       <header className="px-8 max-w-3xl mb-4 self-center">
         <h1 className="text-h3">Pedidos</h1>
       </header>

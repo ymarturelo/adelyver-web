@@ -40,13 +40,13 @@ export default function FindClientForm() {
   };
 
   return (
-    <div className="w-full max-w-lg px-6 pb-6 grid grid-rows-[auto_1fr]">
+    <div className="flex flex-col gap-4">
       <form
         id="find-client-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-rows-auto"
+        className="grid grid-row[auto_1fr] h-full"
       >
-        <FieldGroup className="pb-2">
+        <FieldGroup>
           <Controller
             name="name"
             control={form.control}
@@ -74,7 +74,7 @@ export default function FindClientForm() {
             )}
           />
         </FieldGroup>
-        <div className="flex justify-end mt-auto">
+        <div className="flex justify-end items-end">
           <Button
             type="submit"
             className="sticky ml-auto bottom-12 rounded-full p-0 size-fit aspect-square"

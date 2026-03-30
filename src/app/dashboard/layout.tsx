@@ -20,41 +20,50 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const socials = [
-    [IoLogoWhatsapp, "+5353535353", "tel:+5353535353"],
-    [IoLogoInstagram, "@tubeibita", "https://instagram.com/dinastars_"],
+    [IoLogoWhatsapp, "+5353539439", "https://wa.me/+5353539439"],
+    [
+      IoLogoInstagram,
+      "@_adelyslauraa",
+      "https://www.instagram.com/_adelyslauraa/",
+    ],
     [
       IoMail,
       "adelyslauradiazordaz@gmail.com",
-      "mailto:adelyslauradiazordaz@gmail.com",
+      "https://adelyslauradiazordaz@gmail.com",
     ],
   ] as const;
 
   return (
     <AuthGuard>
-      <Navbar>
-        <Dialog>
-          <DialogTrigger className="ml-auto">
-            <MessageCircleQuestionMarkIcon />
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader className="text-left">
-              <DialogTitle> ¿Tienes alguna duda?</DialogTitle>
-              <DialogDescription> Comunícate con nosotros. </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-2">
-              {socials.map(([Icon, label, link]) => (
-                <Button className="w-fit" key={link} variant="ghost">
-                  <Link href={link} className="flex gap-2 items-center">
-                    <Icon className="size-6!" />
-                    <span className="pb-1">{label}</span>
-                  </Link>
-                </Button>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
-      </Navbar>
-      <ClientGuard>{children}</ClientGuard>
+      <div className="min-h-dvh flex flex-col">
+        <Navbar>
+          <Dialog>
+            <DialogTrigger className="ml-auto">
+              <MessageCircleQuestionMarkIcon />
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader className="text-left">
+                <DialogTitle> ¿Tienes alguna duda?</DialogTitle>
+                <DialogDescription>
+                  {" "}
+                  Comunícate con nosotros.{" "}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-2">
+                {socials.map(([Icon, label, link]) => (
+                  <Button className="w-fit" key={link} variant="ghost">
+                    <Link href={link} className="flex gap-2 items-center">
+                      <Icon className="size-6!" />
+                      <span className="pb-1">{label}</span>
+                    </Link>
+                  </Button>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </Navbar>
+        <ClientGuard>{children}</ClientGuard>
+      </div>
     </AuthGuard>
   );
 }

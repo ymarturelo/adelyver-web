@@ -11,10 +11,12 @@ export default async function Layout({
   return (
     <AuthGuard>
       <AdminGuard>
-        <Navbar>
-          <AdminNavbarLinks />
-        </Navbar>
-        {children}
+        <div className="min-h-dvh flex flex-col">
+          <Navbar>
+            <AdminNavbarLinks />
+          </Navbar>
+          {children}
+        </div>
       </AdminGuard>
     </AuthGuard>
   );
