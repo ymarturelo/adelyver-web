@@ -23,14 +23,15 @@ import { deleteProductByAdminAction } from "@/features/actions/OrdersController.
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import EditProductForm from "./EditProductForm";
+import { OrderDto } from "@/features/abstractions/IOrderController";
 
 type ProductAdminEditProps = {
-  orderId: string;
+  order: OrderDto;
 };
 
-export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
+export default function ProductAdminEdit({ order }: ProductAdminEditProps) {
   const queryClient = useQueryClient();
-  const productsQuery = useGetClientOrderProducts(orderId);
+  const productsQuery = useGetClientOrderProducts(order.id);
 
   const onRemoveProduct = async (productId: string) => {
     const res = await deleteProductByAdminAction(productId);
@@ -41,7 +42,7 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
     }
 
     await queryClient.invalidateQueries({
-      queryKey: ["orders", orderId, "products"],
+      queryKey: ["orders", order.id, "products"],
     });
 
     toast.success("Producto eliminado correctamente");
@@ -67,6 +68,8 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
     productsQuery.data,
     (product) => product.trackingNumber
   );
+
+  const isCancelled = order.status === "cancelled";
 
   return (
     <>
@@ -94,7 +97,7 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
                 <Button
                   asChild
                   variant="link"
-                  className="p-0 !px-0 justify-start text-muted-foreground"
+                  className="p-0 px-0! justify-start text-muted-foreground"
                 >
                   <a
                     href={product.url}
@@ -116,6 +119,7 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
                       variant={"ghost"}
                       size={"icon"}
                       className=" h-9 w-9 hover:text-destructive"
+                      disabled={isCancelled}
                     >
                       <Trash2 size={18} />
                     </Button>
@@ -155,6 +159,7 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
                     variant="ghost"
                     size="icon"
                     className="h-9 w-9 hover:text-primary"
+                    disabled={isCancelled}
                   >
                     <Pencil size={18} />
                   </Button>

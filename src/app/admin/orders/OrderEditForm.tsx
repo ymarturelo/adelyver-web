@@ -57,11 +57,14 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
     }
   };
 
+  const isCancelled = order.status === "cancelled";
+
   return (
     <div>
       <form id="order-edit-form" onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
-          <Controller
+
+          {!isCancelled && <Controller
             control={form.control}
             name="status"
             render={({ field, fieldState }) => (
@@ -78,7 +81,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
                 )}
               </Field>
             )}
-          />
+          />}
           <Controller
             control={form.control}
             name="packagePrice"
@@ -87,6 +90,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
                 <FieldLabel>Precio del paquete (USD)</FieldLabel>
                 <Input
                   {...field}
+                  disabled={isCancelled}
                   id="order-form-package-price"
                   aria-invalid={fieldState.invalid}
                   placeholder="0.00"
@@ -105,6 +109,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
                 <FieldLabel>Precio del envío (USD)</FieldLabel>
                 <Input
                   {...field}
+                  disabled={isCancelled}
                   id="order-form-shipping-price"
                   aria-invalid={fieldState.invalid}
                   placeholder="0.00"
@@ -123,6 +128,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
                 <FieldLabel>Dinero invertido (USD)</FieldLabel>
                 <Input
                   {...field}
+                  disabled={isCancelled}
                   id="order-form-invested-money"
                   aria-invalid={fieldState.invalid}
                   placeholder="0.00"
@@ -142,6 +148,7 @@ export default function OrderEditForm({ order }: OrderEditFormProps) {
                 <FieldLabel>Dinero pagado por el cliente (USD)</FieldLabel>
                 <Input
                   {...field}
+                  disabled={isCancelled}
                   id="order-form-aPBC"
                   aria-invalid={fieldState.invalid}
                   placeholder="0.00"

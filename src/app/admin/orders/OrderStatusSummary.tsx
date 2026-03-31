@@ -39,7 +39,6 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
 
   const { label } = getOrderStatusInfo(order.status);
 
-
   return (
     <Accordion type="single" collapsible className="max-w-lg">
       <AccordionItem className="" value="shipping">
@@ -47,7 +46,7 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
           <div>
             <CircularProgress size={64} status={order.status} />
           </div>
-          <AccordionTrigger className="[&>svg]:h-6 [&>svg]:w-6 w-[100%] hover:no-underline hover:text-primary transition-colors">
+          <AccordionTrigger className="[&>svg]:h-6 [&>svg]:w-6 w-full hover:no-underline hover:text-primary transition-colors">
             <div className="text-left">
               <h3 className="text-xl">{label}</h3>
               <p className="font-light text-sm">
@@ -67,58 +66,60 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
           <div className="col-span-2">
             <AccordionContent>
               <OrderEditForm order={order} />
-              <ProductAdminEdit orderId={order.id} />
-              <div className="grid gap-y-5 mt-10 ">
-                <CreateProductForm orderId={order.id} />
-                <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                  <DrawerTrigger asChild>
-                    <Button variant="secondary">
-                      <BanIcon /> Cancelar Pedido
-                    </Button>
-                  </DrawerTrigger>
-                  <DrawerContent>
-                    <DrawerHeader>
-                      <DrawerTitle>Cancelar Pedido</DrawerTitle>
-                      <DrawerDescription>
-                        Está seguro que desea cancelar este pedido? Esta acción
-                        no se puede deshacer
-                      </DrawerDescription>
-                    </DrawerHeader>
-                    <DrawerFooter>
-                      <Button
-                        variant="destructive"
-                        onClick={() =>
-                          updateOrderMutation.mutate(
-                            {
-                              orderId: order.id,
-                              status: "cancelled",
-                            },
-                            {
-                              onSuccess: () => setIsDrawerOpen(false),
-                            }
-                          )
-                        }
-                        disabled={updateOrderMutation.isPending}
-                      >
-                        {updateOrderMutation.isPending ? (
-                          <Spinner data-icon="inline-start" />
-                        ) : (
-                          <BanIcon />
-                        )}
-                        {updateOrderMutation.isPending
-                          ? "Cancelando..."
-                          : "Cancelar Pedido"}
+              <ProductAdminEdit order={order} />
+              {order.status !== "cancelled" &&
+                <div className="grid gap-y-5 mt-10 ">
+                  <CreateProductForm orderId={order.id} />
+                  <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                    <DrawerTrigger asChild>
+                      <Button variant="secondary">
+                        <BanIcon /> Cancelar Pedido
                       </Button>
-                      <DrawerClose asChild>
-                        <Button variant="ghost">
-                          <ChevronLeft />
-                          Atrás
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <DrawerHeader>
+                        <DrawerTitle>Cancelar Pedido</DrawerTitle>
+                        <DrawerDescription>
+                          Está seguro que desea cancelar este pedido? Esta acción
+                          no se puede deshacer
+                        </DrawerDescription>
+                      </DrawerHeader>
+                      <DrawerFooter>
+                        <Button
+                          variant="destructive"
+                          onClick={() =>
+                            updateOrderMutation.mutate(
+                              {
+                                orderId: order.id,
+                                status: "cancelled",
+                              },
+                              {
+                                onSuccess: () => setIsDrawerOpen(false),
+                              }
+                            )
+                          }
+                          disabled={updateOrderMutation.isPending}
+                        >
+                          {updateOrderMutation.isPending ? (
+                            <Spinner data-icon="inline-start" />
+                          ) : (
+                            <BanIcon />
+                          )}
+                          {updateOrderMutation.isPending
+                            ? "Cancelando..."
+                            : "Cancelar Pedido"}
                         </Button>
-                      </DrawerClose>
-                    </DrawerFooter>
-                  </DrawerContent>
-                </Drawer>
-              </div>
+                        <DrawerClose asChild>
+                          <Button variant="ghost">
+                            <ChevronLeft />
+                            Atrás
+                          </Button>
+                        </DrawerClose>
+                      </DrawerFooter>
+                    </DrawerContent>
+                  </Drawer>
+                </div>
+              }
             </AccordionContent>
           </div>
         </div>

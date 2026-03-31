@@ -35,7 +35,7 @@ export default function Navbar({ children }: { children: ReactNode }) {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="aspect-square rounded-full h-full bg-primary p-2 grid place-content-center text-white "
+            className="aspect-square rounded-full min-w-10 h-fit bg-primary p-2 grid place-content-center text-white "
           >
             {userQuery.isLoading ? (
               <Spinner className="size-4" />
@@ -47,7 +47,7 @@ export default function Navbar({ children }: { children: ReactNode }) {
         <PopoverContent className="w-fit h-fit mr-4">
           <div className="grid gap-4 justify-center">
             <div className="grid gap-1 text-center">
-              <div className="aspect-square justify-self-center rounded-full bg-primary p-2 grid w-fit h-fit min-w-[2.5rem] place-content-center text-white">
+              <div className="aspect-square justify-self-center rounded-full bg-primary p-2 grid w-fit h-fit min-w-10 place-content-center text-white">
                 {getInitials(userQuery.data?.fullName)}
               </div>
               <h4 className="leading-none mb-1 font-medium">
