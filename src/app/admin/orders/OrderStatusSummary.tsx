@@ -1,5 +1,5 @@
 "use client";
-import { getOrderStatusInfo, OrderModel } from "@/features/models/OrderModel";
+import { getOrderStatusInfo } from "@/features/models/OrderModel";
 import {
   Accordion,
   AccordionContent,
@@ -25,14 +25,7 @@ import { useUpdateOrder } from "@/mutations/useUpdateAdminOrder";
 import CircularProgress from "@/app/__components/CircularProgress";
 import CreateProductForm from "./CreateProductForm";
 import ProductAdminEdit from "./ProductAdminEdit";
-import {
-  BanIcon,
-  Check,
-  CheckIcon,
-  ChevronLeft,
-  TriangleAlert,
-  XIcon,
-} from "lucide-react";
+import { BanIcon, ChevronLeft } from "lucide-react";
 import { OrderDto } from "@/features/abstractions/IOrderController";
 import { useState } from "react";
 
@@ -45,6 +38,7 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
   const updateOrderMutation = useUpdateOrder();
 
   const { label } = getOrderStatusInfo(order.status);
+
 
   return (
     <Accordion type="single" collapsible className="max-w-lg">
@@ -111,7 +105,9 @@ export default function OrderStatusSummary({ order }: OrderStatusSummaryProps) {
                         ) : (
                           <BanIcon />
                         )}
-                        Cancelar Pedido
+                        {updateOrderMutation.isPending
+                          ? "Cancelando..."
+                          : "Cancelar Pedido"}
                       </Button>
                       <DrawerClose asChild>
                         <Button variant="ghost">

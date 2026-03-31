@@ -56,7 +56,7 @@ export default function ProductAdminEdit({ orderId }: ProductAdminEditProps) {
   }
   if (productsQuery.isLoading || !productsQuery.data) {
     return (
-      <div className="py-8 flex gap-2">
+      <div className="py-8 flex gap-2 items-center">
         <Spinner />
         <span>Cargando productos...</span>
       </div>

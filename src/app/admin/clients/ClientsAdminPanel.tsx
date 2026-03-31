@@ -34,7 +34,7 @@ export default function ClientsAdminPanel() {
   }
   if (clientsQuery.isLoading || !clientsQuery.data) {
     return (
-      <span className="flex gap-4 items-center">
+      <span className="flex items-center justify-center p-20 gap-3">
         <Spinner />
         <span>Cargando clientes...</span>
       </span>

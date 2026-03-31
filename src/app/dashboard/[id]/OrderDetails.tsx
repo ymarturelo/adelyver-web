@@ -23,9 +23,10 @@ export default function OrderDetails() {
 
   if (orderQuery.isLoading)
     return (
-      <div className="p-10 flex justify-center">
+      <span className="flex items-center justify-center p-20 gap-3 mt-50">
         <Spinner />
-      </div>
+        <span>Cargando pedido...</span>
+      </span>
     );
 
   if (!orderQuery.data)
