@@ -13,7 +13,6 @@ import OrderForm from "../OrderForm";
 import { Button } from "@/app/__components/ui/button";
 import { cn } from "@/app/__lib/utils";
 import { CheckIcon } from "lucide-react";
-import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 
 type UpdateOrderFormProps = {
@@ -48,7 +47,7 @@ export default function UpdateOrderForm({
     }
 
     await queryClient.invalidateQueries({
-      queryKey: ["client-orders"],
+      queryKey: ["orders", orderId],
     });
 
     toast.success("Pedido actualizado exitosamente");
