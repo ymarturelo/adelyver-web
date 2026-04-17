@@ -1,5 +1,5 @@
 export const getDirtyItemsData = <
-  TData extends Record<keyof TDirtyItems, unknown>,
+  TData extends Partial<Record<keyof TDirtyItems, unknown>>,
   TDirtyItems extends Record<string, unknown>
 >(
   data: TData,

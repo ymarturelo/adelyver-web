@@ -77,7 +77,7 @@ export type UpdateOrderByAdminRequest = {
 
 export type CreateProductRequest = {
   orderId: string;
-  trackingNumber: string;
+  trackingNumber?: string;
   name: string;
   idFromShop: string;
   url: string;

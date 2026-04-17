@@ -315,7 +315,7 @@ export const createSupabaseOrdersController = (
         storeProductId: req.idFromShop,
         url: req.url,
         name: req.name,
-        trackingNumber: req.trackingNumber,
+        trackingNumber: req.trackingNumber ?? "",
       });
       return Result.ok(undefined);
     },
