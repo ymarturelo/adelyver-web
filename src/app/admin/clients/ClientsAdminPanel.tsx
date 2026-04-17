@@ -15,6 +15,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/app/__components/ui/empty";
+import { Skeleton } from "@/app/__components/ui/skeleton";
 
 export default function ClientsAdminPanel() {
   const searchParams = useSearchParams();
@@ -33,11 +34,22 @@ export default function ClientsAdminPanel() {
     return <p>Ha ocurrido un error de tipo: {clientsQuery.error.message}</p>;
   }
   if (clientsQuery.isLoading || !clientsQuery.data) {
+    const arr = Array.from({ length: 3 });
     return (
-      <span className="flex items-center justify-center p-20 gap-3">
-        <Spinner />
-        <span>Cargando clientes...</span>
-      </span>
+      <div className="flex flex-col gap-15 max-w-xl mt-20">
+        {arr.map((_, index) => (
+          <div
+            key={`clients-skeletons-${index}`}
+            className="flex items-center gap-4"
+          >
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-30" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-60" />
+            </div>
+          </div>
+        ))}
+      </div>
     );
   }
   if (clientsQuery.data.length === 0) {

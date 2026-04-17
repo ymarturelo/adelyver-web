@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const productFormValuesSchema = z.object({
-  trackingNumber: z.string().min(1, "El número de seguimiento es obligatorio"),
+  trackingNumber: z.string().optional(),
 
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
 

@@ -14,6 +14,7 @@ import {
   EmptyTitle,
 } from "../__components/ui/empty";
 import { DrawerTrigger } from "../__components/ui/drawer";
+import { Skeleton } from "../__components/ui/skeleton";
 
 export default function OrderStatusView() {
   const ordersQuery = useGetClientAllOrders();
@@ -26,11 +27,22 @@ export default function OrderStatusView() {
   }
 
   if (ordersQuery.isLoading || !ordersQuery.data) {
+    const arr = Array.from({ length: 4 });
     return (
-      <span className="flex items-center justify-center p-20 gap-3">
-        <Spinner />
-        <span>Cargando pedidos...</span>
-      </span>
+      <div className="flex flex-col gap-10 mt-4 max-w-xl">
+        {arr.map((_, index) => (
+          <div
+            key={`orders-skeletons-${index}`}
+            className="flex items-center gap-4 "
+          >
+            <Skeleton className="h-16 w-16 rounded-full shrink-0" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-60" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+          </div>
+        ))}
+      </div>
     );
   }
 

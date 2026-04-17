@@ -1,6 +1,6 @@
 "use client";
 import { LogOutIcon } from "lucide-react";
-import Logo from "@/app/__assets/PNG-06.png";
+import Logo from "@/app/__assets/PNG-0006.png";
 import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
@@ -25,13 +25,17 @@ export default function Navbar({ children }: { children: ReactNode }) {
 
   return (
     <nav className="sticky gap-4 top-0 bg-background/85 backdrop-blur-sm z-10 flex p-5 items-center mb-5 w-full md:w-xl md:mx-auto">
-      <div className="relative overflow-hidden size-12">
-        <Image src={Logo} alt="" className="absolute size-full scale-[6]" />
+      <div className="relative h-10 w-32 overflow-hidden">
+        <Image
+          src={Logo}
+          alt=""
+          className="absolute object-contain size-full scale-[4]"
+        />
       </div>
 
       {children}
 
-      {!userQuery.isLoading && userQuery.data &&
+      {!userQuery.isLoading && userQuery.data && (
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -79,7 +83,7 @@ export default function Navbar({ children }: { children: ReactNode }) {
             </div>
           </PopoverContent>
         </Popover>
-      }
+      )}
     </nav>
   );
 }

@@ -12,6 +12,7 @@ import {
 } from "@/app/__components/ui/empty";
 import { ClipboardPlusIcon } from "lucide-react";
 import { FindOrdersRequest } from "@/features/abstractions/IOrderController";
+import { Skeleton } from "@/app/__components/ui/skeleton";
 
 export default function OrderAdminPanel() {
   const searchParams = useSearchParams();
@@ -48,9 +49,22 @@ export default function OrderAdminPanel() {
   }
 
   if (ordersQuery.isLoading || !ordersQuery.data) {
+    const arr = Array.from({ length: 4 });
     return (
-      <div className="flex items-center justify-center p-20 gap-3">
-        <Spinner /> <span>Cargando pedidos...</span>
+      <div className="flex flex-col gap-10 mt-4 max-w-xl">
+        {arr.map((_, index) => (
+          <div
+            key={`orders-skeletons-${index}`}
+            className="flex items-center gap-4 "
+          >
+            <Skeleton className="h-16 w-16 rounded-full shrink-0" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-60" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-25" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

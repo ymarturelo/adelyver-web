@@ -7,8 +7,6 @@ import {
   AccordionTrigger,
 } from "../../__components/ui/accordion";
 import { Separator } from "../../__components/ui/separator";
-import useFindOrdersQuery from "@/queries/useFindOrdersQuery";
-import { Spinner } from "../../__components/ui/spinner";
 
 type ClientInfoSummaryProps = {
   name: string;
@@ -31,12 +29,12 @@ export default function ClientInfoSummary({
         <AccordionItem value={phone.toString()} className="border-none">
           <div className="">
             <AccordionTrigger className="[&>svg]:h-6 [&>svg]:w-6 w-[100%] hover:no-underline hover:text-primary transition-colors">
-              <div className="text-left">
+              <div className="text-left grid w-full">
                 <div className="flex items-baseline gap-x-2">
-                  <h2 className="text-xl font-semibold text-foreground truncate max-w-xs">
+                  <h2 className="text-xl font-semibold text-foreground max-w-xs">
                     {name}
                   </h2>
-                  <span className="text-sm font-medium text-muted-foreground shrink-0">
+                  <span className="text-sm font-medium text-muted-foreground shrink-0 ml-auto">
                     ({phone})
                   </span>
                 </div>

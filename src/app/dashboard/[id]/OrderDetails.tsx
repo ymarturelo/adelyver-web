@@ -9,6 +9,7 @@ import {
 } from "@/features/models/OrderModel";
 import CircularProgress from "@/app/__components/CircularProgress";
 import UpdateOrderForm from "./UpdateOrderForm";
+import { Skeleton } from "@/app/__components/ui/skeleton";
 
 export default function OrderDetails() {
   const params = useParams();
@@ -21,14 +22,17 @@ export default function OrderDetails() {
     );
   }
 
-  if (orderQuery.isLoading)
+  if (orderQuery.isLoading) {
     return (
-      <span className="flex items-center justify-center p-20 gap-3 mt-50">
-        <Spinner />
-        <span>Cargando pedido...</span>
-      </span>
+      <div className="flex items-center gap-4 mt-4 max-w-xl ml-5">
+        <Skeleton className="h-16 w-16 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-60" />
+          <Skeleton className="h-4 w-40" />
+        </div>
+      </div>
     );
-
+  }
   if (!orderQuery.data)
     return <p className="p-10 text-center">Pedido no encontrado</p>;
 
